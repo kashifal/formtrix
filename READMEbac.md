@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# Matrix2
-For Fox Group
-=======
 # Introduction
 
 This is material design template created based on materially structure
@@ -14,4 +10,3 @@ This is material design template created based on materially structure
 2. Deployment process
     - Goto full-version directory and open package.json. Update homepage URL to the production URL
     - Goto full-version directory and run 'npm run build / yarn build'
->>>>>>> 40342ba (Initial commit)
