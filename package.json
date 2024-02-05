@@ -25,6 +25,7 @@
         "@mui/system": "^5.14.5",
         "@mui/utils": "^5.14.5",
         "@mui/x-data-grid": "^6.11.2",
+        "@mui/x-data-grid-pro": "^6.18.5",
         "@mui/x-date-pickers": "^6.11.2",
         "@reduxjs/toolkit": "^1.9.5",
         "@tabler/icons-react": "^2.32.0",

@@ -1,56 +1,43 @@
 import { useEffect, useState } from 'react';
-
-// material-ui
-import { Grid } from '@mui/material';
+import { Grid, Card, CardContent } from '@mui/material';
 
 // project imports
-import EarningCard from './EarningCard';
-import PopularCard from './PopularCard';
-import TotalOrderLineChartCard from './TotalOrderLineChartCard';
-import TotalIncomeDarkCard from './TotalIncomeDarkCard';
-import TotalIncomeLightCard from './TotalIncomeLightCard';
-import TotalGrowthBarChart from './TotalGrowthBarChart';
+import ToDoList from './ToDoList';
+import EmployeeProgress from './EmployeeProgress';
 import { gridSpacing } from 'store/constant';
-
-// ==============================|| DEFAULT DASHBOARD ||============================== //
 
 const Dashboard = () => {
     const [isLoading, setLoading] = useState(true);
+
     useEffect(() => {
         setLoading(false);
     }, []);
 
     return (
         <Grid container spacing={gridSpacing}>
-            <Grid item xs={12}>
-                <Grid container spacing={gridSpacing}>
-                    <Grid item lg={4} md={6} sm={6} xs={12}>
-                        <EarningCard isLoading={isLoading} />
-                    </Grid>
-                    <Grid item lg={4} md={6} sm={6} xs={12}>
-                        <TotalOrderLineChartCard isLoading={isLoading} />
-                    </Grid>
-                    <Grid item lg={4} md={12} sm={12} xs={12}>
-                        <Grid container spacing={gridSpacing}>
-                            <Grid item sm={6} xs={12} md={6} lg={12}>
-                                <TotalIncomeDarkCard isLoading={isLoading} />
-                            </Grid>
-                            <Grid item sm={6} xs={12} md={6} lg={12}>
-                                <TotalIncomeLightCard isLoading={isLoading} />
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                </Grid>
+            {/* Top Row */}
+            <Grid item lg={6} md={6} sm={12} xs={12}>
+                <Card sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                    <CardContent sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                        {isLoading ? (
+                            <p>Loading...</p> // Replace with a loading indicator as needed
+                        ) : (
+                            <img
+                                src="/images/Hurt.png"
+                                alt="Company Logo"
+                                style={{ width: '100%', height: 'auto', maxHeight: '100%' }}
+                            />
+                        )}
+                    </CardContent>
+                </Card>
             </Grid>
+            <Grid item lg={6} md={6} sm={12} xs={12}>
+                <ToDoList isLoading={isLoading} />
+            </Grid>
+
+            {/* Bottom Row */}
             <Grid item xs={12}>
-                <Grid container spacing={gridSpacing}>
-                    <Grid item xs={12} md={8}>
-                        <TotalGrowthBarChart isLoading={isLoading} />
-                    </Grid>
-                    <Grid item xs={12} md={4}>
-                        <PopularCard isLoading={isLoading} />
-                    </Grid>
-                </Grid>
+                <EmployeeProgress isLoading={isLoading} />
             </Grid>
         </Grid>
     );

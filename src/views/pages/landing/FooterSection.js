@@ -63,12 +63,10 @@ const FooterSection = () => {
                             <Grid item xs={12} md={4}>
                                 <Stack spacing={{ xs: 2, md: 5 }}>
                                     <Typography variant="h4" color={textColor} sx={{ fontWeight: 500 }}>
-                                        About Berry
+                                        Fox Training Matrix
                                     </Typography>
                                     <Typography variant="body2" color={textColor}>
-                                        Berry React is a dashboard template that utilizes the Material-UI framework and the React JavaScript
-                                        library. It offers a range of features and customization options to help you create a powerful and
-                                        user-friendly admin panel.
+                                        Fox Training Matrix empowers you to see clearly where your staff are trained and where there are gaps.
                                     </Typography>
                                 </Stack>
                             </Grid>

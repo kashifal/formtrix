@@ -11,7 +11,7 @@ import Chart from 'react-apexcharts';
 // project imports
 import useConfig from 'hooks/useConfig';
 import MainCard from 'ui-component/cards/MainCard';
-import chartData from './chart-data/market-share-area-chart';
+import chartData from './chart-data/heatmapData';
 
 // assets
 import { IconBrandFacebook, IconBrandYoutube, IconBrandTwitter } from '@tabler/icons-react';

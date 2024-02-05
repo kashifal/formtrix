@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
-import { useDispatch } from 'store';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -8,6 +7,7 @@ import {
     Box,
     Button,
     Checkbox,
+    Divider,
     FormControl,
     FormControlLabel,
     FormHelperText,
@@ -27,22 +27,24 @@ import { Formik } from 'formik';
 
 // project imports
 import AnimateButton from 'ui-component/extended/AnimateButton';
+
 import useAuth from 'hooks/useAuth';
+import useConfig from 'hooks/useConfig';
 import useScriptRef from 'hooks/useScriptRef';
 import { strengthColor, strengthIndicatorNumFunc } from 'utils/password-strength';
-import { openSnackbar } from 'store/slices/snackbar';
 
 // assets
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
+import Google from 'assets/images/icons/google.svg';
+
 // ===========================|| FIREBASE - REGISTER ||=========================== //
 
-const JWTRegister = ({ ...others }) => {
+const FirebaseRegister = ({ ...others }) => {
     const theme = useTheme();
-    const navigate = useNavigate();
     const scriptedRef = useScriptRef();
-    const dispatch = useDispatch();
+    const { borderRadius } = useConfig();
 
     const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
     const [showPassword, setShowPassword] = React.useState(false);
@@ -50,7 +52,15 @@ const JWTRegister = ({ ...others }) => {
 
     const [strength, setStrength] = React.useState(0);
     const [level, setLevel] = React.useState();
-    const { register } = useAuth();
+    const { firebaseRegister, firebaseGoogleSignIn } = useAuth();
+
+    const googleHandler = async () => {
+        try {
+            await firebaseGoogleSignIn();
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
@@ -73,6 +83,52 @@ const JWTRegister = ({ ...others }) => {
     return (
         <>
             <Grid container direction="column" justifyContent="center" spacing={2}>
+                <Grid item xs={12}>
+                    <AnimateButton>
+                        <Button
+                            variant="outlined"
+                            fullWidth
+                            onClick={googleHandler}
+                            size="large"
+                            sx={{
+                                color: 'grey.700',
+                                backgroundColor: theme.palette.mode === 'dark' ? theme.palette.dark.main : theme.palette.grey[50],
+                                borderColor: theme.palette.mode === 'dark' ? theme.palette.dark.light + 20 : theme.palette.grey[100]
+                            }}
+                        >
+                            <Box sx={{ mr: { xs: 1, sm: 2, width: '20px' } }}>
+                                <img src={Google} alt="google" width={16} height={16} style={{ marginRight: matchDownSM ? 8 : 16 }} />
+                            </Box>
+                            Sign up with Google
+                        </Button>
+                    </AnimateButton>
+                </Grid>
+                <Grid item xs={12}>
+                    <Box sx={{ alignItems: 'center', display: 'flex' }}>
+                        <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
+                        <Button
+                            variant="outlined"
+                            sx={{
+                                cursor: 'unset',
+                                m: 2,
+                                py: 0.5,
+                                px: 7,
+                                borderColor:
+                                    theme.palette.mode === 'dark'
+                                        ? `${theme.palette.dark.light + 20} !important`
+                                        : `${theme.palette.grey[100]} !important`,
+                                color: `${theme.palette.grey[900]} !important`,
+                                fontWeight: 500,
+                                borderRadius: `${borderRadius}px`
+                            }}
+                            disableRipple
+                            disabled
+                        >
+                            OR
+                        </Button>
+                        <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
+                    </Box>
+                </Grid>
                 <Grid item xs={12} container alignItems="center" justifyContent="center">
                     <Box sx={{ mb: 2 }}>
                         <Typography variant="subtitle1">Sign up with Email address</Typography>
@@ -84,8 +140,6 @@ const JWTRegister = ({ ...others }) => {
                 initialValues={{
                     email: '',
                     password: '',
-                    firstName: '',
-                    lastName: '',
                     submit: null
                 }}
                 validationSchema={Yup.object().shape({
@@ -94,25 +148,10 @@ const JWTRegister = ({ ...others }) => {
                 })}
                 onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                     try {
-                        await register(values.email, values.password, values.firstName, values.lastName);
+                        await firebaseRegister(values.email, values.password);
                         if (scriptedRef.current) {
                             setStatus({ success: true });
                             setSubmitting(false);
-                            dispatch(
-                                openSnackbar({
-                                    open: true,
-                                    message: 'Your registration has been successfully completed.',
-                                    variant: 'alert',
-                                    alert: {
-                                        color: 'success'
-                                    },
-                                    close: false
-                                })
-                            );
-
-                            setTimeout(() => {
-                                navigate('/login', { replace: true });
-                            }, 1500);
                         }
                     } catch (err) {
                         console.error(err);
@@ -132,11 +171,9 @@ const JWTRegister = ({ ...others }) => {
                                     fullWidth
                                     label="First Name"
                                     margin="normal"
-                                    name="firstName"
+                                    name="fname"
                                     type="text"
-                                    value={values.firstName}
-                                    onBlur={handleBlur}
-                                    onChange={handleChange}
+                                    defaultValue=""
                                     sx={{ ...theme.typography.customInput }}
                                 />
                             </Grid>
@@ -145,11 +182,9 @@ const JWTRegister = ({ ...others }) => {
                                     fullWidth
                                     label="Last Name"
                                     margin="normal"
-                                    name="lastName"
+                                    name="lname"
                                     type="text"
-                                    value={values.lastName}
-                                    onBlur={handleBlur}
-                                    onChange={handleChange}
+                                    defaultValue=""
                                     sx={{ ...theme.typography.customInput }}
                                 />
                             </Grid>
@@ -281,4 +316,4 @@ const JWTRegister = ({ ...others }) => {
     );
 };
 
-export default JWTRegister;
+export default FirebaseRegister;

@@ -8,6 +8,8 @@ import AuthGuard from 'utils/route-guard/AuthGuard';
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 const DashboardAnalytics = Loadable(lazy(() => import('views/dashboard/Analytics')));
+const DashboardCompany = Loadable(lazy(() => import('views/dashboard/Company')));
+const DashboardCoSkill = Loadable(lazy(() => import('views/dashboard/CoSkill')));
 
 // widget routing
 const WidgetStatistics = Loadable(lazy(() => import('views/widget/Statistics')));
@@ -517,7 +519,15 @@ const MainRoutes = {
         {
             path: '/dashboard/analytics',
             element: <DashboardAnalytics />
-        }
+        },
+        {
+            path: '/dashboard/coskill/:company/:skill',
+            element: <DashboardCoSkill />
+          },
+          {
+            path: '/dashboard/coskill/:company',
+            element: <DashboardCompany />
+          },
     ]
 };
 
