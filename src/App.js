@@ -26,6 +26,7 @@ import { FirebaseProvider as AuthProvider } from 'contexts/FirebaseContext';
 
 // ==============================|| APP ||============================== //
 
+
 const App = () => {
     const [loading, setLoading] = useState(false);
 
