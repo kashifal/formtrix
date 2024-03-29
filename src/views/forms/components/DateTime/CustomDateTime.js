@@ -2,29 +2,29 @@ import * as React from 'react';
 
 // material-ui
 import { InputAdornment } from '@mui/material';
-import { LocalizationProvider, MobileDateTimePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider, MobileDatePicker } from '@mui/x-date-pickers'; // Changed from MobileDateTimePicker to MobileDatePicker
 import '@mui/lab';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 // assets
 import DateRangeIcon from '@mui/icons-material/DateRange';
 
-// ==============================|| CUSTOM DATETIME ||============================== //
+// ==============================|| CUSTOM DATE ||============================== //
 
-const CustomDateTime = () => {
-    const [value, setValue] = React.useState(new Date('2019-01-01T18:54'));
+const CustomDate = () => {
+    const [value, setValue] = React.useState(new Date('2024-12-30')); // Adjusted the date format to ISO standard for better compatibility
 
     return (
         <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <MobileDateTimePicker
+            <MobileDatePicker
                 value={value}
                 onChange={(newValue) => {
                     setValue(newValue);
                 }}
-                label="Basic Datetime Picker"
+                label="Date Completed"
                 onError={console.log}
-                minDate={new Date('2018-01-01T00:00')}
-                format="yyyy/MM/dd hh:mm a"
+                minDate={new Date('2000-01-01')} // Adjusted the date format here as well
+                format="dd/MM/yyyy"
                 slotProps={{
                     textField: {
                         margin: 'normal',
@@ -43,4 +43,4 @@ const CustomDateTime = () => {
     );
 };
 
-export default CustomDateTime;
+export default CustomDate;

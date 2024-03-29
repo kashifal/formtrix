@@ -13,7 +13,7 @@ const icons = {
 };
 const samplePage = {
     id: 'sample-page',
-    title: <FormattedMessage id="sample-page" />,
+    title: <FormattedMessage id="Skills Report" />,
     icon: icons.IconBrandChrome,
     type: 'group',
     url: '/sample-page'

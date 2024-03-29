@@ -4,7 +4,6 @@ import axios from 'axios';
 import { Grid, Card, CardContent, Typography, CardMedia } from '@mui/material';
 import EmployeeTable from './EmployeeTable';
 
-
 function DashboardCoSkill() {
     const { company, skill } = useParams();
     const [companyData, setCompanyData] = useState(null);
@@ -12,8 +11,7 @@ function DashboardCoSkill() {
     useEffect(() => {
         const fetchCompanyData = async () => {
             try {
-                // Assuming the 'website' field in API matches the 'company' URL parameter
-                const response = await axios.get(`https://glowing-paradise-cfe00f2697.strapiapp.com/api/companies?filters[website][$eq]=${company}`);
+                const response = await axios.get(`https://glowing-paradise-cfe00f2697.strapiapp.com/api/companies?filters[website][$eq]=${company}&populate=*`);
                 if (response.data && response.data.data.length > 0) {
                     setCompanyData(response.data.data[0].attributes);
                 }
@@ -23,59 +21,86 @@ function DashboardCoSkill() {
         };
 
         fetchCompanyData();
-   }, [company]);
+    }, [company]);
 
+    const getLogoUrl = (companyData) => {
+        if (companyData.logo && companyData.logo.data.length > 0) {
+            const logoAttributes = companyData.logo.data[0].attributes;
+            const logoFormats = logoAttributes.formats;
+    
+            // Check if formats exist and then check for each specific format
+            if (logoFormats) {
+                if (logoFormats.medium) {
+                    return logoFormats.medium.url;
+                } else if (logoFormats.small) {
+                    return logoFormats.small.url;
+                } else if (logoFormats.thumbnail) {
+                    return logoFormats.thumbnail.url;
+                }
+            }
+    
+            // Fallback to the default URL if formats do not exist or specific formats are not available
+            return logoAttributes.url;
+        }
+        return ''; // Return empty string or a default placeholder image URL if no logo is available
+    };
+    
     return (
         <div>
             <Grid container spacing={2}>
-                {/* Left-hand side card for company information */}
                 <Grid item xs={12} md={6}>
                     <Card>
                         <CardContent>
-                            <Typography variant="h5" component="div">
-                                Company Information
-                            </Typography>
-                            {companyData && (
-                                <div>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {companyData.name}
-                                    </Typography>
-                                    <CardMedia
-                                        component="img"
-                                        image={`/images/${companyData.logourl}`}
-                                        alt={`${companyData.name} Logo`}
-                                        sx={{
-                                            maxWidth: '100%', 
-                                            maxHeight: '140px', 
-                                            objectFit: 'contain',
-                                            margin: 'auto'
-                                        }}
-                                    />
-
-                                </div>
+                            {companyData && getLogoUrl(companyData) && (
+                                <CardMedia
+                                    component="img"
+                                    image={getLogoUrl(companyData)}
+                                    alt={`${companyData.name} Logo`}
+                                    sx={{
+                                        maxWidth: '100%', 
+                                        maxHeight: '140px', 
+                                        objectFit: 'contain',
+                                        margin: 'auto'
+                                    }}
+                                />
                             )}
                         </CardContent>
                     </Card>
                 </Grid>
 
-                {/* Right-hand side card for skill */}
                 <Grid item xs={12} md={6}>
                     <Card>
                         <CardContent>
-                            <Typography variant="h1" component="div">
+                            {companyData && (
+                                <>
+                                    <Typography variant="h3" component="div">
+                                        {companyData.name}
+                                    </Typography>
+                                    <Typography variant="subtitle" color="text.secondary">
+                                        {companyData.address1}
+                                    </Typography>
+                                    <Typography variant="subtitle" color="text.secondary">
+                                        {companyData.address2}
+                                    </Typography>
+                                </>
+                            )}
+                            <Typography variant="h3" component="div">
                                 {skill} Role
                             </Typography>
-                            {/* Additional content related to the skill */}
+                            Employees below are skilled in this role: {skill}.
+                            {/* Here you can add additional content related to the skill */}
                         </CardContent>
                     </Card>
                 </Grid>
 
-                {/* Bottom larger content area */}
                 <Grid item xs={12}>
                     <Card>
-                    <CardContent>
-                        <EmployeeTable company={company} />
-                    </CardContent>
+                        <CardContent>
+                            <Typography variant="h6" component="div">
+                                Employee Table
+                            </Typography>
+                            <EmployeeTable company={company} skill={skill} />
+                        </CardContent>
                     </Card>
                 </Grid>
             </Grid>

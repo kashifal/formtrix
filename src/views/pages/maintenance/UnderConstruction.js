@@ -55,7 +55,7 @@ const CardMediaParts = styled('img')({
 
 // ========================|| UNDER CONSTRUCTION PAGE ||======================== //
 
-const UnderConstruction = () => {
+const CustomErrorComponent = () => {
     const theme = useTheme();
 
     return (
@@ -78,18 +78,18 @@ const UnderConstruction = () => {
                             <Grid container spacing={gridSpacing}>
                                 <Grid item xs={12}>
                                     <Typography variant="h1" component="div">
-                                        Under Construction
+                                        Fox Training Matrix 
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Typography variant="body2">
-                                        This site is on under construction!! Please check after some time
+                                        This page is still under construction! You have reached this page in error. 
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={12}>
                                     <AnimateButton>
                                         <Button variant="contained" size="large" component={Link} to={DASHBOARD_PATH}>
-                                            <HomeTwoToneIcon sx={{ fontSize: '1.3rem', mr: 0.75 }} /> Home
+                                            <HomeTwoToneIcon sx={{ fontSize: '1.3rem', mr: 0.75 }} /> Click here to go back to the home page
                                         </Button>
                                     </AnimateButton>
                                 </Grid>
@@ -102,4 +102,4 @@ const UnderConstruction = () => {
     );
 };
 
-export default UnderConstruction;
+export default CustomErrorComponent;

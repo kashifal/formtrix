@@ -1,84 +1,121 @@
-import React from 'react';
-
-// material-ui
-import { CardActions, CardContent, Checkbox, Divider, Fab, FormControlLabel, Grid } from '@mui/material';
-
-// project imports
+import React, { useState, useEffect } from 'react';
+import { CardActions, CardContent, Checkbox, Divider, Fab, FormControlLabel, Grid, TextField, IconButton } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
-
-// assets
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import DeleteIcon from '@mui/icons-material/Delete';
 
-// ===========================|| DATA WIDGET - TODO LIST ||=========================== //
+// Helper function to make API requests
+const api = (endpoint, method = 'GET', body = null) => {
+  const headers = { 'Content-Type': 'application/json' };
+  return fetch(`https://glowing-paradise-cfe00f2697.strapiapp.com/api${endpoint}`, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : null,
+  }).then(response => response.json());
+};
 
 const ToDoList = () => {
-    const [state, setState] = React.useState({
-        checkedA: true,
-        checkedB: true,
-        checkedC: true,
-        checkedD: false,
-        checkedE: false,
-        checkedF: false
+  const [todos, setTodos] = useState([]);
+  const [newTodoTitle, setNewTodoTitle] = useState('');
+
+  useEffect(() => {
+    api('/todos').then(data => setTodos(data.data));
+  }, []);
+
+  const addTodo = () => {
+    api('/todos', 'POST', {
+      data: {
+        title: newTodoTitle,
+        completed: false,
+        employee: 'default' // Adapt 'employee' as needed
+      }
+    }).then(response => {
+      const newTodo = response.data;
+      setTodos([...todos, newTodo]);
+      setNewTodoTitle(''); // Clear the input after adding
     });
+  };
+  
+  const toggleTodo = (id, completed) => {
+    api(`/todos/${id}`, 'PUT', {
+      data: { completed: !completed },
+    }).then(response => {
+      const updatedTodo = response.data;
+      const newTodos = todos.map(todo =>
+        todo.id === id ? updatedTodo : todo
+      );
+      setTodos(newTodos);
+    });
+  };
 
-    const handleChangeState = (event) => {
-        setState({ ...state, [event.target.name]: event.target.checked });
-    };
+  const deleteTodo = (id) => {
+    api(`/todos/${id}`, 'DELETE').then(() => {
+      const newTodos = todos.filter(todo => todo.id !== id);
+      setTodos(newTodos);
+    });
+  };
 
-    return (
-        <MainCard title="To Do List" content={false}>
-            <CardContent>
-                <Grid container spacing={0} sx={{ '& .Mui-checked + span': { textDecoration: 'line-through' } }}>
-                    <Grid item xs={12}>
-                        <FormControlLabel
-                            control={<Checkbox checked={state.checkedA} onChange={handleChangeState} name="checkedA" color="primary" />}
-                            label="Check your Email"
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <FormControlLabel
-                            control={<Checkbox checked={state.checkedB} onChange={handleChangeState} name="checkedB" color="primary" />}
-                            label="Make YouTube Video"
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <FormControlLabel
-                            control={<Checkbox checked={state.checkedC} onChange={handleChangeState} name="checkedC" color="primary" />}
-                            label="Create Banner"
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <FormControlLabel
-                            control={<Checkbox checked={state.checkedD} onChange={handleChangeState} name="checkedD" color="primary" />}
-                            label="Upload Project"
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <FormControlLabel
-                            control={<Checkbox checked={state.checkedE} onChange={handleChangeState} name="checkedE" color="primary" />}
-                            label="Update Task"
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <FormControlLabel
-                            control={<Checkbox checked={state.checkedF} onChange={handleChangeState} name="checkedF" color="primary" />}
-                            label="Task Issue"
-                        />
-                    </Grid>
+  return (
+    <MainCard title="To Do List" content={false}>
+      <CardContent>
+        <Grid container spacing={2}>
+          {todos.map((todo) => (
+            <Grid item xs={12} key={todo.id}>
+              <Grid container alignItems="center">
+                <Grid item>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={todo.attributes.completed}
+                        onChange={() => toggleTodo(todo.id, todo.attributes.completed)}
+                        name={`checked-${todo.id}`}
+                        color="primary"
+                      />
+                    }
+                    label={todo.attributes.title}
+                  />
                 </Grid>
-            </CardContent>
-            <Divider />
-            <CardActions>
-                <Grid container direction="row-reverse">
-                    <Grid item>
-                        <Fab size="small" color="primary" aria-label="new todo add">
-                            <AddRoundedIcon fontSize="small" />
-                        </Fab>
-                    </Grid>
+                <Grid item>
+                  <IconButton onClick={() => deleteTodo(todo.id)}>
+                    <DeleteIcon />
+                  </IconButton>
                 </Grid>
-            </CardActions>
-        </MainCard>
-    );
+              </Grid>
+            </Grid>
+          ))}
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="New To Do"
+              value={newTodoTitle}
+              onChange={(e) => setNewTodoTitle(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newTodoTitle.trim() !== '') {
+                  addTodo();
+                  e.preventDefault();
+                }
+              }}
+            />
+          </Grid>
+        </Grid>
+      </CardContent>
+      <Divider />
+      <CardActions>
+        <Grid container direction="row-reverse">
+          <Grid item>
+            <Fab
+              size="small"
+              color="primary"
+              aria-label="add"
+              onClick={() => newTodoTitle.trim() !== '' && addTodo()}
+            >
+              <AddRoundedIcon />
+            </Fab>
+          </Grid>
+        </Grid>
+      </CardActions>
+    </MainCard>
+  );
 };
 
 export default ToDoList;

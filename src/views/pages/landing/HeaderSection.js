@@ -1,6 +1,7 @@
 import { Link as RouterLink } from 'react-router-dom';
 import { useMemo } from 'react';
 
+
 // material-ui
 import { useTheme, styled } from '@mui/material/styles';
 import { Box, Button, Container, Grid, Stack, Typography } from '@mui/material';
@@ -87,13 +88,15 @@ const HeaderSection = () => {
                                 animate={{ opacity: 1, translateY: 0 }}
                                 transition={{ type: 'spring', stiffness: 150, damping: 30 }}
                             >
-                                <Stack spacing={1}>
-                                    <Typography textAlign={{ xs: 'center', md: 'left' }} variant="h1" sx={headerSX}>
-                                        Fox Training Matrix 
-                                    </Typography>
+<Stack spacing={1} alignItems="flex-start">
+    <img src="/images/foxgroups.png" alt="Fox Groups Logo" style={{ width: '200px', marginBottom: '16px' }} />
+    <Typography variant="h1" sx={headerSX}>
+        Fox Training Matrix
+    </Typography>
+</Stack>
 
 
-                                </Stack>
+                              
                             </motion.div>
                         </Grid>
                         <Grid item xs={12} sx={{ mt: -2.5, textAlign: { xs: 'center', md: 'left' } }}>

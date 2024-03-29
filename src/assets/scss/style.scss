@@ -63,6 +63,8 @@
     }
 }
 
+
+
 // ==============================|| ANIMATION KEYFRAMES ||============================== //
 
 @keyframes wings {
@@ -191,3 +193,12 @@
 .ReactModal__Overlay {
     z-index: 99999 !important;
 }
+
+
+.expired {
+    background-color: rgba(255, 0, 0, 0.2);
+  }
+  
+  .expiring-soon {
+    background-color: yellow;
+  }

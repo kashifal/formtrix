@@ -1,10 +1,9 @@
 import React, { Component } from "react";
 import Chart from "react-apexcharts";
-import axios from "axios"; 
-
+import axios from "axios";
 
 class HeatMapChart extends Component {
-   constructor(props) {
+  constructor(props) {
     super(props);
 
     this.state = {
@@ -15,7 +14,7 @@ class HeatMapChart extends Component {
           type: "heatmap",
           events: {
             mounted: (chartContext, config) => {
-              // Your existing mounted event code
+              // Existing mounted event code
               const yaxisLabels = config.globals.dom.baseEl.querySelectorAll('.apexcharts-yaxis-labels text');
               yaxisLabels.forEach((label) => {
                 label.style.cursor = 'pointer';
@@ -29,15 +28,14 @@ class HeatMapChart extends Component {
               const skillName = config.w.config.series[config.seriesIndex].data[config.dataPointIndex].x;
               const url = `/dashboard/CoSkill/${companyName}/${skillName}/`;
               window.location.href = url; // Or use your routing method
-            }
+            },
           },
         },
-
         plotOptions: {
           heatmap: {
-            shadeIntensity: 0.2,
+            shadeIntensity: 0.5,
             radius: 0,
-            useFillColorAsStroke: false,
+            useFillColorAsStroke: true,
             colorScale: {
               ranges: [
                 {
@@ -71,11 +69,19 @@ class HeatMapChart extends Component {
         title: {
           text: "State of Training for each Fox Group Company",
         },
+        tooltip: {
+          y: {
+            formatter: function(value, { series, seriesIndex, dataPointIndex, w }) {
+              const companyName = w.config.series[seriesIndex].name;
+              const skillName = w.config.series[seriesIndex].data[dataPointIndex].x;
+              return `${companyName} - ${skillName}`;
+            }
+          }
+        },
       },
       series: [],
-      companyNames: [], 
+      companyNames: [],
       courseNames: [],
-
     };
 
     this.handleLabelClick = this.handleLabelClick.bind(this);
@@ -92,7 +98,6 @@ class HeatMapChart extends Component {
       console.error("Error loading data:", err);
     });
   }
-  
 
   loadCompanyNames() {
     return axios.get("https://glowing-paradise-cfe00f2697.strapiapp.com/api/companies/")
@@ -102,34 +107,38 @@ class HeatMapChart extends Component {
       });
   }
 
-  
-
-loadSkillNames() {
-  return axios.get("https://glowing-paradise-cfe00f2697.strapiapp.com/api/skills/")
-    .then(response => {
-      // Map over the 'data' array and extract the 'role' from each 'attributes' object
-      const skills = response.data.data;
-      return skills.map(skill => skill.attributes.role);
-    });
-}
-
-
-
+  loadSkillNames() {
+    return axios.get("https://glowing-paradise-cfe00f2697.strapiapp.com/api/skills/")
+      .then(response => {
+        // Map over the 'data' array and extract the 'role' from each 'attributes' object
+        const skills = response.data.data;
+        return skills.map(skill => skill.attributes.role);
+      });
+  }
 
   generateRandomData(companyNames, skillNames) {
     return companyNames.map(companyName => {
-      const data = skillNames.map(skillName => ({
-        x: skillName,
-        y: Math.floor(Math.random() * 100) // Generating a random percentage
-      }));
+      const data = skillNames.map(skillName => {
+        let value;
 
-  
+        // If the company is MTS and the skill is one of the specified ones, set the value to 40
+        if (companyName === "MTS" && (skillName === "MTS - Trainers" || skillName === "MTS_Office_Staff")) {
+          value = 40;
+        } else {
+          // For all other companies and skills, generate a random value between 0 and 30
+          value = Math.floor(Math.random() * 20);
+        }
+        return {
+          x: skillName,
+          y: value,
+        };
+      });
+
       return {
         name: companyName,
         data,
       };
     });
-  
   }
 
   handleLabelClick(company) {
@@ -138,7 +147,7 @@ loadSkillNames() {
 
   render() {
     return (
-      <div className="mixed-chart" style={{width: '100%'}}>
+      <div className="mixed-chart" style={{ width: '100%' }}>
         <Chart
           options={this.state.options}
           series={this.state.series}

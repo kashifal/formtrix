@@ -4,6 +4,7 @@
     "private": true,
     "dependencies": {
         "@auth0/auth0-spa-js": "^2.1.2",
+        "@date-io/date-fns": "^3.0.0",
         "@emotion/cache": "^11.11.0",
         "@emotion/react": "^11.11.1",
         "@emotion/styled": "^11.11.0",
@@ -26,7 +27,7 @@
         "@mui/utils": "^5.14.5",
         "@mui/x-data-grid": "^6.11.2",
         "@mui/x-data-grid-pro": "^6.18.5",
-        "@mui/x-date-pickers": "^6.11.2",
+        "@mui/x-date-pickers": "^6.19.3",
         "@reduxjs/toolkit": "^1.9.5",
         "@tabler/icons-react": "^2.32.0",
         "amazon-cognito-identity-js": "^6.3.3",
@@ -91,6 +92,7 @@
         "stylis-plugin-rtl": "^2.1.1",
         "util": "^0.12.5",
         "uuid": "^9.0.0",
+        "vercel": "^33.4.1",
         "web-vitals": "^3.4.0",
         "yup": "^1.2.0"
     },

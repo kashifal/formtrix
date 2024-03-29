@@ -10,11 +10,11 @@ const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')))
 const DashboardAnalytics = Loadable(lazy(() => import('views/dashboard/Analytics')));
 const DashboardCompany = Loadable(lazy(() => import('views/dashboard/Company')));
 const DashboardCoSkill = Loadable(lazy(() => import('views/dashboard/CoSkill')));
+const DashboardEmCourse = Loadable(lazy(() => import('views/dashboard/EmCourse')));
+const DashboardTraining = Loadable(lazy(() => import('views/dashboard/Training')));
 
 // widget routing
-const WidgetStatistics = Loadable(lazy(() => import('views/widget/Statistics')));
-const WidgetData = Loadable(lazy(() => import('views/widget/Data')));
-const WidgetChart = Loadable(lazy(() => import('views/widget/Chart')));
+
 
 // application - user social & account profile routing
 const AppUserSocialProfile = Loadable(lazy(() => import('views/application/users/social-profile')));
@@ -134,6 +134,10 @@ const UtilsGrid = Loadable(lazy(() => import('views/utilities/Grid')));
 
 // sample page routing
 const SamplePage = Loadable(lazy(() => import('views/sample-page')));
+const SkillCompany = Loadable(lazy(() => import('views/skill-company')));
+const SkillReport = Loadable(lazy(() => import('views/skill-report')));
+const FullReport = Loadable (lazy(() => import('views/full-report-monks')));
+const Employee = Loadable(lazy(() => import('views/employee')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -145,18 +149,7 @@ const MainRoutes = {
         </AuthGuard>
     ),
     children: [
-        {
-            path: '/widget/statistics',
-            element: <WidgetStatistics />
-        },
-        {
-            path: '/widget/data',
-            element: <WidgetData />
-        },
-        {
-            path: '/widget/chart',
-            element: <WidgetChart />
-        },
+
 
         {
             path: '/apps/user/social-profile/:tab',
@@ -513,12 +506,44 @@ const MainRoutes = {
             element: <SamplePage />
         },
         {
+            path: '/skill-company',
+            element: <SkillCompany /> 
+        },
+        {
+            path: '/full-report-monks',
+            element: <FullReport />
+        },
+        {
+            path: '/skill-report/:skillId/:courseId',   // New route    
+            element: <SkillReport />    
+        },
+        {
+            path: '/skill-report',
+            element: <SkillReport />
+        },
+        {
+            path: '/employee',
+            element: <Employee />
+        },
+        {
             path: '/dashboard/default',
             element: <DashboardDefault />
         },
         {
             path: '/dashboard/analytics',
             element: <DashboardAnalytics />
+        },
+        {
+            path: '/dashboard/emcourse/:employee/:course',
+            element: <DashboardEmCourse />
+        },
+        {
+            path: '/dashboard/emcourse/:course',
+            element: <DashboardEmCourse />
+        },
+        {
+            path: '/dashboard/emcourse',
+            element: <DashboardEmCourse />
         },
         {
             path: '/dashboard/coskill/:company/:skill',
@@ -528,6 +553,10 @@ const MainRoutes = {
             path: '/dashboard/coskill/:company',
             element: <DashboardCompany />
           },
+          {
+            path: '/dashboard/training',
+            element: <DashboardTraining />  
+          }
     ]
 };
 

@@ -18,12 +18,8 @@ import {
     ListItemText,
     Stack,
     Toolbar,
-    Typography,
     useScrollTrigger
 } from '@mui/material';
-
-// project imports
-import Logo from 'ui-component/Logo';
 
 // assets
 import { IconBook, IconCreditCard, IconDashboard, IconHome2 } from '@tabler/icons-react';
@@ -69,27 +65,19 @@ const AppBar = ({ ...others }) => {
             <MuiAppBar>
                 <Container>
                     <Toolbar sx={{ py: 2.5, px: `0 !important` }}>
-                        <Typography component="div" sx={{ flexGrow: 1, textAlign: 'left' }}>
-                            <Logo />
-                        </Typography>
+                        <Box sx={{ flexGrow: 1 }} />
                         <Stack direction="row" sx={{ display: { xs: 'none', sm: 'block' } }} spacing={{ xs: 1.5, md: 2.5 }}>
-                            <Button color="inherit" component={Link} href="#">
-                                Home
-                            </Button>
                             <Button color="inherit" component={RouterLink} to="/login" target="_blank">
-                                Dashboard
-                            </Button>
-                            <Button color="inherit" component={Link} href="#" target="_blank">
-                                More information
+                                Home
                             </Button>
                             <Button
                                 component={Link}
-                                href="https://links.codedthemes.com/hsqll"
+                                href="https://monkstraining.com/"
                                 disableElevation
                                 variant="contained"
                                 color="secondary"
                             >
-                                Monks Training
+                                Monks Training Services Ltd. Website
                             </Button>
                         </Stack>
                         <Box sx={{ display: { xs: 'block', sm: 'none' } }}>

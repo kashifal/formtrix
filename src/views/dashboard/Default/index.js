@@ -23,7 +23,7 @@ const Dashboard = () => {
                             <p>Loading...</p> // Replace with a loading indicator as needed
                         ) : (
                             <img
-                                src="/images/Hurt.png"
+                                src="/images/Monks.jpg"
                                 alt="Company Logo"
                                 style={{ width: '100%', height: 'auto', maxHeight: '100%' }}
                             />

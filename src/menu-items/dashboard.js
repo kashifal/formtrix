@@ -2,10 +2,11 @@
 import { FormattedMessage } from 'react-intl';
 
 // assets
-import { IconDashboard, IconDeviceAnalytics } from '@tabler/icons-react';
+import { IconDashboard, IconChartInfographic, IconDeviceAnalytics } from '@tabler/icons-react';
 
 const icons = {
     IconDashboard,
+    IconChartInfographic,
     IconDeviceAnalytics
 };
 
@@ -19,7 +20,7 @@ const dashboard = {
     children: [
         {
             id: 'admin',
-            title: <FormattedMessage id="admin" />,
+            title: <FormattedMessage id="Admin" />,
             type: 'item',
             url: '/dashboard/default',
             icon: icons.IconDashboard,
@@ -27,11 +28,21 @@ const dashboard = {
         },
         {
             id: 'management',
-            title: <FormattedMessage id="management" />,
+            title: <FormattedMessage id="Management" />,
             type: 'item',
             url: '/dashboard/analytics',
             icon: icons.IconDeviceAnalytics,
             breadcrumbs: false
+        },
+        {
+            id: 'training',
+            title: <FormattedMessage id="My Company" />,
+            type: 'item',
+            url: '/dashboard/training',
+            icon: icons.IconChartInfographic,
+            breadcrumbs: false
+        
+
         }
     ]
 };
