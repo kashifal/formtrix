@@ -43,6 +43,14 @@ const dashboard = {
             breadcrumbs: false
         
 
+        },
+        {
+            id: 'util-grid',
+            title: <FormattedMessage id="Induction Pages" />,
+            type: 'item',
+            url: '/utils/util-grid',
+            icon: icons.IconLayoutGridAdd,
+            breadcrumbs: false
         }
     ]
 };

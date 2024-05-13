@@ -13,49 +13,20 @@ class HeatMapChart extends Component {
           height: "100%",
           type: "heatmap",
           events: {
-            mounted: (chartContext, config) => {
-              // Existing mounted event code
-              const yaxisLabels = config.globals.dom.baseEl.querySelectorAll('.apexcharts-yaxis-labels text');
-              yaxisLabels.forEach((label) => {
-                label.style.cursor = 'pointer';
-                label.onclick = () => {
-                  this.handleLabelClick(label.textContent.trim());
-                };
-              });
-            },
-            dataPointSelection: (event, chartContext, config) => {
-              const companyName = config.w.config.series[config.seriesIndex].name;
-              const skillName = config.w.config.series[config.seriesIndex].data[config.dataPointIndex].x;
-              const url = `/dashboard/CoSkill/${companyName}/${skillName}/`;
-              window.location.href = url; // Or use your routing method
-            },
+            mounted: this.handleMounted.bind(this),
+            dataPointSelection: this.handleDataPointSelection.bind(this),
           },
         },
         plotOptions: {
           heatmap: {
-            shadeIntensity: 0.5,
             radius: 0,
-            useFillColorAsStroke: true,
+            enableShades: true,
+            shadeIntensity: 0.8,
             colorScale: {
               ranges: [
-                {
-                  from: 0,
-                  to: 30,
-                  name: "Training Expired",
-                  color: "#FF0000",
-                },
-                {
-                  from: 31,
-                  to: 70,
-                  name: "Training Needed",
-                  color: "#FFB200",
-                },
-                {
-                  from: 71,
-                  to: 100,
-                  name: "Fully Trained",
-                  color: "#00A100",
-                },
+                { from: 0, to: 30, name: "Training Expired", color: "#FF0000" },
+                { from: 31, to: 70, name: "Training Needed", color: "#FFB200" },
+                { from: 71, to: 100, name: "Fully Trained", color: "#00A100" },
               ],
             },
           },
@@ -71,92 +42,118 @@ class HeatMapChart extends Component {
         },
         tooltip: {
           y: {
-            formatter: function(value, { series, seriesIndex, dataPointIndex, w }) {
-              const companyName = w.config.series[seriesIndex].name;
-              const skillName = w.config.series[seriesIndex].data[dataPointIndex].x;
-              return `${companyName} - ${skillName}`;
-            }
-          }
+            formatter: function (value, opts) {
+              return opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex].x;
+            },
+          },
         },
       },
       series: [],
-      companyNames: [],
-      courseNames: [],
     };
 
     this.handleLabelClick = this.handleLabelClick.bind(this);
   }
 
-  componentDidMount() {
-    Promise.all([
-      this.loadCompanyNames(),
-      this.loadSkillNames()
-    ]).then(([companyNames, skillNames]) => {
-      const series = this.generateRandomData(companyNames, skillNames);
+  async componentDidMount() {
+    try {
+      const [companyNames, skillNames] = await Promise.all([
+        this.loadCompanyNames(),
+        this.loadSkillNames(),
+      ]);
+
+      const seriesPromises = companyNames.map(async (companyName) => {
+        const skillDataPromises = skillNames.map(async (skillName) => {
+          const employees = await this.fetchEmployeesByCompanyAndSkill(companyName, skillName);
+          const completedEmployees = await Promise.all(
+            employees.map(async (employee) => {
+              const courses = await this.fetchEmployeeCourses(employee.id);
+              return courses.every((course) => course.attributes.DateCompleted !== null);
+            })
+          );
+
+          const allEmployeesCompleted = completedEmployees.every((completed) => completed);
+
+          return {
+            x: skillName,
+            y: allEmployeesCompleted ? 0 : 70,
+          };
+        });
+
+        return {
+          name: companyName,
+          data: await Promise.all(skillDataPromises),
+        };
+      });
+
+      const series = await Promise.all(seriesPromises);
       this.setState({ series });
-    }).catch((err) => {
+    } catch (err) {
       console.error("Error loading data:", err);
-    });
+    }
   }
 
   loadCompanyNames() {
     return axios.get("https://glowing-paradise-cfe00f2697.strapiapp.com/api/companies/")
-      .then(response => {
-        const companies = response.data.data;
-        return companies.map(company => company.attributes.website); // Using 'website' instead of 'name'
-      });
+      .then(response => response.data.data.map(company => company.attributes.website));
   }
 
   loadSkillNames() {
     return axios.get("https://glowing-paradise-cfe00f2697.strapiapp.com/api/skills/")
-      .then(response => {
-        // Map over the 'data' array and extract the 'role' from each 'attributes' object
-        const skills = response.data.data;
-        return skills.map(skill => skill.attributes.role);
-      });
+      .then(response => response.data.data.map(skill => skill.attributes.role));
   }
 
-  generateRandomData(companyNames, skillNames) {
-    return companyNames.map(companyName => {
-      const data = skillNames.map(skillName => {
-        let value;
+  async fetchEmployeesByCompanyAndSkill(companyName, skillName) {
+    const response = await axios.get(`https://glowing-paradise-cfe00f2697.strapiapp.com/api/employees?filters[company][website][$eq]=${companyName}&filters[skills][role][$eq]=${skillName}`);
+    return response.data.data;
+  }
 
-        // If the company is MTS and the skill is one of the specified ones, set the value to 40
-        if (companyName === "MTS" && (skillName === "MTS - Trainers" || skillName === "MTS_Office_Staff")) {
-          value = 40;
-        } else {
-          // For all other companies and skills, generate a random value between 0 and 30
-          value = Math.floor(Math.random() * 20);
-        }
-        return {
-          x: skillName,
-          y: value,
-        };
-      });
+  async fetchEmployeeCourses(employeeId) {
+    const response = await axios.get(`https://glowing-paradise-cfe00f2697.strapiapp.com/api/employee-courses?filters[employee][id][$eq]=${employeeId}&populate[course]=name,shortname,datecompleted`);
+    return response.data.data;
+  }
 
-      return {
-        name: companyName,
-        data,
+  handleMounted(chartContext, config) {
+    const yaxisLabels = config.globals.dom.baseEl.querySelectorAll('.apexcharts-yaxis-labels text');
+    yaxisLabels.forEach((label) => {
+      label.style.cursor = 'pointer';
+      label.onclick = () => {
+        this.handleLabelClick(label.textContent.trim());
       };
     });
   }
-
-  handleLabelClick(company) {
-    this.props.history.push(`/${company.toLowerCase()}`);
+  
+  handleDataPointSelection(event, chartContext, config) {
+    const companyName = config.w.config.series[config.seriesIndex].name;
+    const skillName = config.w.config.series[config.seriesIndex].data[config.dataPointIndex].x;
+    const url = `/dashboard/CoSkill/${companyName}/${skillName}/`;
+    window.location.href = url;
   }
-
-  render() {
-    return (
-      <div className="mixed-chart" style={{ width: '100%' }}>
-        <Chart
-          options={this.state.options}
-          series={this.state.series}
-          type="heatmap"
-          width="100%"
-        />
-      </div>
-    );
+  
+    handleLabelClick(company) {
+      this.props.history.push(`/${company.toLowerCase()}`);
+    }
+  
+    render() {
+      const { series } = this.state;
+  
+      return (
+        <div className="mixed-chart" style={{ width: '100%' }}>
+          {series.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: 20 }}>
+              <p>Thanks for waiting, we are digging out your records...</p>
+              <img src="/images/constructionwork.gif" alt="Construction Work" />
+            </div>
+          ) : (
+            <Chart
+              options={this.state.options}
+              series={series}
+              type="heatmap"
+              width="100%"
+            />
+          )}
+        </div>
+      );
+    }
   }
-}
-
-export default HeatMapChart;
+  
+  export default HeatMapChart;

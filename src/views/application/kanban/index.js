@@ -1,115 +1,135 @@
-import { useEffect, useState } from 'react';
-import { useLocation, Link, Outlet } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Autocomplete, Grid, TextField, List, ListItem, ListItemText, Typography, Button, Alert } from '@mui/material';
 
-// material-ui
-import { useTheme } from '@mui/material/styles';
-import { Box, Grid, Tab, Tabs } from '@mui/material';
-import { getUserStory, getUserStoryOrder, getProfiles, getComments, getItems, getColumns, getColumnsOrder } from 'store/slices/kanban';
-
-// project imports
-import Loader from 'ui-component/Loader';
-import MainCard from 'ui-component/cards/MainCard';
-
-import { useDispatch } from 'store';
-
-function a11yProps(index) {
-    return {
-        id: `simple-tab-${index}`,
-        'aria-controls': `simple-tabpanel-${index}`
-    };
-}
-
-// ==============================|| APPLICATION - KANBAN ||============================== //
-
-export default function KanbanPage() {
-    const theme = useTheme();
-    const dispatch = useDispatch();
-    const { pathname } = useLocation();
-
-    const [loading, setLoading] = useState(true);
-
-    let selectedTab = 0;
-    switch (pathname) {
-        case '/apps/kanban/backlogs':
-            selectedTab = 1;
-            break;
-        case '/apps/kanban/board':
-        default:
-            selectedTab = 0;
-    }
-
-    const [value, setValue] = useState(selectedTab);
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
+const Certificates = () => {
+    const [employees, setEmployees] = useState([]);
+    const [selectedEmployee, setSelectedEmployee] = useState(null);
+    const [employeeCourses, setEmployeeCourses] = useState([]);
+    const [selectedCourse, setSelectedCourse] = useState(null);
+    const [certificateFile, setCertificateFile] = useState(null);
+    const [uploadSuccess, setUploadSuccess] = useState(false);
 
     useEffect(() => {
-        const items = dispatch(getItems());
-        const columns = dispatch(getColumns());
-        const columnOrder = dispatch(getColumnsOrder());
-        const profile = dispatch(getProfiles());
-        const comments = dispatch(getComments());
-        const story = dispatch(getUserStory());
-        const storyOrder = dispatch(getUserStoryOrder());
-
-        Promise.all([items, columns, columnOrder, profile, comments, story, storyOrder]).then(() => setLoading(false));
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        fetchEmployees();
     }, []);
 
-    if (loading) return <Loader />;
+    useEffect(() => {
+        if (selectedEmployee) {
+            fetchEmployeeCourses();
+        }
+    }, [selectedEmployee]);
+
+    const fetchEmployees = () => {
+        fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/employees')
+            .then(response => response.json())
+            .then(data => {
+                const formattedEmployees = data.data.map(employee => ({
+                    label: employee.attributes.fullname,
+                    id: employee.id,
+                    ...employee.attributes,
+                }));
+                setEmployees(formattedEmployees);
+            });
+    };
+
+    const fetchEmployeeCourses = () => {
+        fetch(`https://glowing-paradise-cfe00f2697.strapiapp.com/api/employee-courses?filters[employee][id][$eq]=${selectedEmployee.id}&populate[course]=name`)
+            .then(response => response.json())
+            .then(data => {
+                setEmployeeCourses(data.data);
+            });
+    };
+
+    const handleCertificateUpload = (event) => {
+        const file = event.target.files[0];
+        setCertificateFile(file);
+    };
+
+    const handleCertificateSubmit = () => {
+        if (selectedCourse && certificateFile) {
+            const formData = new FormData();
+            formData.append('files.certificate', certificateFile);
+            formData.append('data', JSON.stringify({
+                employee: selectedEmployee.id,
+                course: selectedCourse.attributes.course.data.id,
+            }));
+
+            fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/certificates', {
+                method: 'POST',
+                body: formData,
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Certificate uploaded successfully:', data);
+                    setUploadSuccess(true);
+                    setTimeout(() => {
+                        setUploadSuccess(false);
+                    }, 3000);
+                    // Optionally, you can refresh the employee courses
+                })
+                .catch(error => {
+                    console.error('Error uploading certificate:', error);
+                    // Handle the error scenario
+                });
+        }
+    };
+
 
     return (
-        <Box sx={{ display: 'flex' }}>
-            <Grid container>
-                <Grid item xs={12}>
-                    <MainCard contentSX={{ p: 2 }}>
-                        <Tabs
-                            value={value}
-                            variant="scrollable"
-                            onChange={handleChange}
-                            sx={{
-                                px: 1,
-                                pb: 2,
-                                '& a': {
-                                    minWidth: 10,
-                                    px: 1,
-                                    py: 1.5,
-                                    mr: 2.25,
-                                    color: theme.palette.mode === 'dark' ? 'grey.600' : 'grey.900',
-                                    display: 'flex',
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                },
-                                '& a.Mui-selected': {
-                                    color: 'primary.main'
-                                },
-                                '& a > svg': {
-                                    marginBottom: '0px !important',
-                                    mr: 1.25
-                                }
-                            }}
-                        >
-                            <Tab
-                                sx={{ textTransform: 'none' }}
-                                component={Link}
-                                to="/apps/kanban/board"
-                                label={value === 0 ? 'Board' : 'View as Board'}
-                                {...a11yProps(0)}
-                            />
-                            <Tab
-                                sx={{ textTransform: 'none' }}
-                                component={Link}
-                                to="/apps/kanban/backlogs"
-                                label={value === 1 ? 'Backlogs' : 'View as Backlog'}
-                                {...a11yProps(1)}
-                            />
-                        </Tabs>
-
-                        <Outlet />
-                    </MainCard>
-                </Grid>
+        <Grid container spacing={2}>
+            <Grid item xs={12}>
+                <Autocomplete
+                    disableClearable
+                    options={employees}
+                    getOptionLabel={(option) => option.label}
+                    onChange={(event, newValue) => {
+                        setSelectedEmployee(newValue);
+                    }}
+                    renderInput={(params) => <TextField {...params} label="Select Employee" />}
+                />
             </Grid>
-        </Box>
-    );
-}
+
+            {selectedEmployee && (
+                <Grid item xs={12}>
+                    <Typography variant="h6">Select a Course to upload a Certificate for {selectedEmployee.label}</Typography>
+                    <Typography variant="body">Upload for one course at a time </Typography>
+
+                    {employeeCourses.length > 0 ? (
+                        <List>
+                        {employeeCourses.map(employeeCourse => (
+                            <ListItem
+                                key={employeeCourse.id}
+                                onClick={() => setSelectedCourse(employeeCourse)}
+                                button
+                                selected={selectedCourse === employeeCourse}
+                                style={{ backgroundColor: selectedCourse === employeeCourse ? 'lightblue' : 'inherit' }}
+                            >
+                                <ListItemText primary={employeeCourse.attributes.course.data.attributes.name} />
+                            </ListItem>
+                        ))}
+                    </List>
+                ) : (
+                    <Typography>No courses completed yet.</Typography>
+                )}
+            </Grid>
+        )}
+
+        {selectedCourse && (
+            <Grid item xs={12}>
+                <Typography variant="h6">Upload Certificate for {selectedCourse.attributes.course.data.attributes.name}</Typography>
+                <input type="file" onChange={handleCertificateUpload} />
+                <Button variant="contained" onClick={handleCertificateSubmit} disabled={!certificateFile}>
+                    Upload Certificate
+                </Button>
+                {uploadSuccess && (
+                    <Alert severity="success" style={{ marginTop: '1rem' }}>
+                        Training Certificate has been successfully uploaded!
+                    </Alert>
+                )}
+            </Grid>
+        )}
+    </Grid>
+);
+};
+
+export default Certificates;

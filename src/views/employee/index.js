@@ -10,6 +10,7 @@ const EmployeeAll = () => {
     const [employees, setEmployees] = useState([]);
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [employeeCourses, setEmployeeCourses] = useState([]);
+    const [employeeCertificates, setEmployeeCertificates] = useState([]);
 
     useEffect(() => {
         const defaultEmployeeId = 32; // Set the default employee ID to 32
@@ -19,6 +20,7 @@ const EmployeeAll = () => {
     useEffect(() => {
         if (selectedEmployee) {
             fetchEmployeeCourses();
+            fetchEmployeeCertificates();
         }
     }, [selectedEmployee]);
 
@@ -31,6 +33,7 @@ const EmployeeAll = () => {
                 const formattedEmployees = data.data.map(employee => ({
                     label: employee.attributes.fullname,
                     id: employee.id,
+                    ...employee.attributes,
                 }));
                 setEmployees(formattedEmployees);
 
@@ -49,6 +52,16 @@ const EmployeeAll = () => {
             .then(response => response.json())
             .then(data => {
                 setEmployeeCourses(data.data);
+            });
+    };
+
+    const fetchEmployeeCertificates = () => {
+        const apiUrl = `https://glowing-paradise-cfe00f2697.strapiapp.com/api/certificates?populate=*&filters[employee][id][$eq]=${selectedEmployee.id}`;
+
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                setEmployeeCertificates(data.data);
             });
     };
 
@@ -89,7 +102,7 @@ const EmployeeAll = () => {
     return (
         <MainCard title="Courses Completed Per Employee">
             <Grid container spacing={gridSpacing}>
-                <Grid item xs={12}> 
+                <Grid item xs={12}>
                     <SubCard title="Choose Employee">
                         <Grid container direction="column" spacing={3}>
                             <Grid item>
@@ -106,7 +119,39 @@ const EmployeeAll = () => {
                         </Grid>
                     </SubCard>
                 </Grid>
-    
+
+                {selectedEmployee && (
+                    <Grid item xs={12}>
+                        <SubCard title={`Employee Details for ${selectedEmployee.fullname}`}>
+                        <Typography><b>Archived:</b> Current Employee</Typography>
+
+                        <Typography><b>Fullname:</b> {selectedEmployee.fullname}</Typography>
+                        <Typography><b>Job Title:</b> {selectedEmployee.jobtitle}</Typography>
+<Typography><b>Address:</b> {selectedEmployee.address}</Typography>
+<Typography><b>Email:</b> {selectedEmployee.email}</Typography>
+<Typography><b>Home Tel:</b> {selectedEmployee.hometel}</Typography>
+<Typography><b>Mobile Tel:</b> {selectedEmployee.mobiletel}</Typography>
+<Typography><b>Date of Birth:</b> {formatDate(selectedEmployee.dob)}</Typography>
+<Typography><b>National Insurance Number:</b> {selectedEmployee.ni}</Typography>
+<Typography><b>Start Date:</b> {formatDate(selectedEmployee.startdate)}</Typography>
+<Typography><b>Any Certificates?</b> {employeeCertificates.length > 0 ? 'Yes' : 'No'}</Typography>
+
+                            {employeeCertificates.length > 0 && (
+                                <Typography>
+                                    Certificate(s):{' '}
+                                    <a
+                                        href={employeeCertificates[0].attributes.certificate.data.attributes.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        {employeeCertificates[0].attributes.certificate.data.attributes.name}
+                                    </a>
+                                </Typography>
+                            )}
+                        </SubCard>
+                    </Grid>
+                )}
+
                 {selectedEmployee && (
                     <Grid item xs={12}>
                         <SubCard title={`Completed Courses for ${selectedEmployee.label}`}>
@@ -120,7 +165,7 @@ const EmployeeAll = () => {
                                             employeeCourse.attributes.course.data.attributes.YearsExpire
                                         );
                                         const highlightColor = getHighlightColor(completionDate, expiryDate);
-    
+
                                         return (
                                             <ListItem
                                                 key={employeeCourse.id}

@@ -12,6 +12,9 @@ const DashboardCompany = Loadable(lazy(() => import('views/dashboard/Company')))
 const DashboardCoSkill = Loadable(lazy(() => import('views/dashboard/CoSkill')));
 const DashboardEmCourse = Loadable(lazy(() => import('views/dashboard/EmCourse')));
 const DashboardTraining = Loadable(lazy(() => import('views/dashboard/Training')));
+const DashboardEmployee = Loadable(lazy(() => import('views/dashboard/Employee')));
+const DashboardReports = Loadable(lazy(() => import('views/dashboard/Reports')));
+const DashboardSkill = Loadable(lazy(() => import('views/dashboard/Skill')));
 
 // widget routing
 
@@ -43,6 +46,7 @@ const AppKanban = Loadable(lazy(() => import('views/application/kanban')));
 const AppKanbanBacklogs = Loadable(lazy(() => import('views/application/kanban/Backlogs')));
 const AppKanbanBoard = Loadable(lazy(() => import('views/application/kanban/Board')));
 const AppMail = Loadable(lazy(() => import('views/application/mail')));
+const AddStaff = Loadable(lazy(() => import('views/application/add-staff')));
 const AppCalendar = Loadable(lazy(() => import('views/application/calendar')));
 const AppContactCard = Loadable(lazy(() => import('views/application/contact/Card')));
 const AppContactList = Loadable(lazy(() => import('views/application/contact/List')));
@@ -221,6 +225,10 @@ const MainRoutes = {
         {
             path: '/apps/mail',
             element: <AppMail />
+        },
+        {
+            path: '/apps/add-staff',
+            element: <AddStaff />
         },
         {
             path: '/apps/kanban',
@@ -514,12 +522,16 @@ const MainRoutes = {
             element: <FullReport />
         },
         {
-            path: '/skill-report/:skillId/:courseId',   // New route    
+            path: '/skill-report/:companyId/:skillId/:courseId',   // New route    
             element: <SkillReport />    
         },
         {
             path: '/skill-report',
             element: <SkillReport />
+        },
+        {
+            path: '/employee/:skillId/:companyId',
+            element: <Employee />
         },
         {
             path: '/employee',
@@ -532,6 +544,10 @@ const MainRoutes = {
         {
             path: '/dashboard/analytics',
             element: <DashboardAnalytics />
+        },
+        {
+            path: '/dashboard/reports',
+            element: <DashboardReports />
         },
         {
             path: '/dashboard/emcourse/:employee/:course',
@@ -554,9 +570,37 @@ const MainRoutes = {
             element: <DashboardCompany />
           },
           {
+            path: '/dashboard/training/:companyId',
+            element: <DashboardTraining />  
+          },
+          {
             path: '/dashboard/training',
             element: <DashboardTraining />  
-          }
+          },
+
+          {
+            path: '/dashboard/employee/:id/:course/:companyId',
+            element: <DashboardEmployee />
+          },
+
+          {
+            path: '/dashboard/employee/:id/:course',
+            element: <DashboardEmployee />
+          },
+
+          {
+            path: '/dashboard/employee/:id',
+            element: <DashboardEmployee />
+          },
+          {
+            path: '/dashboard/employee',
+            element: <DashboardEmployee />
+        },
+        {
+          path: '/dashboard/skill/:skillId/:companyId',
+          element: <DashboardSkill /> 
+        }
+
     ]
 };
 

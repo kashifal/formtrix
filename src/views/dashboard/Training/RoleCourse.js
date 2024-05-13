@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Box } from '@mui/material';
 import Chart from 'react-apexcharts';
+import { useNavigate } from 'react-router-dom';  // Import useNavigate
 
 const SkillsCoursesHeatmap = () => {
   const [employees, setEmployees] = useState([]);
@@ -9,11 +10,6 @@ const SkillsCoursesHeatmap = () => {
     options: {
       chart: {
         type: 'heatmap',
-        events: {
-          click: () => {
-            window.location.href = '/full-report-monks';
-          },
-        },
       },
       dataLabels: {
         enabled: false,
@@ -48,24 +44,42 @@ const SkillsCoursesHeatmap = () => {
           }
         }
       },
+      tooltip: {
+        custom: function({ seriesIndex, dataPointIndex, w }) {
+          const skill = w.globals.yAxisScale[0].result[seriesIndex];
+          const course = w.globals.labels[dataPointIndex];
+          return `<div>${skill}: ${course}</div>`;
+        }
+      },
+      events: {
+        click: (event, chartContext, config) => {
+          const seriesIndex = config.seriesIndex;
+          const dataPointIndex = config.dataPointIndex;
+          const skillId = employees[seriesIndex].attributes.skills.data[dataPointIndex].id;
+          const companyId = employees[seriesIndex].attributes.company.data.id;
+          navigate(`/dashboard/skill/${skillId}/${companyId}`);
+        },
+      }
     },
     series: [],
   });
 
+  const navigate = useNavigate();  // Initialize navigate function
+
   useEffect(() => {
     const fetchEmployeesAndCourses = async () => {
-      const response = await axios.get(`https://glowing-paradise-cfe00f2697.strapiapp.com/api/employees?filters[company][name][$eq]=Monks Training Services&populate=skills.courses`);
+      const response = await axios.get('https://glowing-paradise-cfe00f2697.strapiapp.com/api/employees?filters[company][name][$eq]=Monks Training Services&populate=skills.courses,company');
       const employeesData = response.data.data;
 
       const employeesWithCourseCompletion = await Promise.all(employeesData.map(async (employee) => {
         const employeeCoursesRes = await axios.get(`https://glowing-paradise-cfe00f2697.strapiapp.com/api/employee-courses?filters[employee][id][$eq]=${employee.id}&populate=*`);
         const completedCourses = employeeCoursesRes.data.data.filter(ec => ec.attributes.DateCompleted !== null).map(ec => ec.attributes.course.data.id);
 
-        return { 
-          ...employee, 
-          attributes: { 
-            ...employee.attributes, 
-            skills: { 
+        return {
+          ...employee,
+          attributes: {
+            ...employee.attributes,
+            skills: {
               data: employee.attributes.skills.data.map(skill => ({
                 ...skill,
                 attributes: {
@@ -95,20 +109,20 @@ const SkillsCoursesHeatmap = () => {
     const coursesSet = new Set();
     const employeesPerSkill = {};
     const completionCountPerCourse = {};
-  
+
     employees.forEach(employee => {
       employee.attributes.skills.data.forEach(skill => {
         const skillName = skill.attributes.role;
         skillsSet.add(skillName);
-  
+
         skill.attributes.courses.data.forEach(course => {
-          const courseName = course.shortname;
+          const courseName = course.attributes.shortname;
           coursesSet.add(courseName);
           const key = `${skillName}|${courseName}`;
-  
+
           if (!employeesPerSkill[skillName]) employeesPerSkill[skillName] = new Set();
           if (!completionCountPerCourse[key]) completionCountPerCourse[key] = { completed: 0, total: 0 };
-  
+
           employeesPerSkill[skillName].add(employee.id);
           completionCountPerCourse[key].total = employeesPerSkill[skillName].size;
           if (course.completed) {
@@ -117,12 +131,12 @@ const SkillsCoursesHeatmap = () => {
         });
       });
     });
-  
+
     const dataMap = {};
     for (const [key, { completed, total }] of Object.entries(completionCountPerCourse)) {
       dataMap[key] = completed === 0 ? 0 : (completed === total ? 2 : 1);
     }
-  
+
     const skills = Array.from(skillsSet);
     const courses = Array.from(coursesSet);
     const series = skills.map(skill => ({
@@ -132,7 +146,7 @@ const SkillsCoursesHeatmap = () => {
         return dataMap[key] || 0;
       }),
     }));
-  
+
     setChartData(prevState => ({
       ...prevState,
       options: {

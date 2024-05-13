@@ -1,140 +1,210 @@
-// material-ui
-import { useTheme } from '@mui/material/styles';
-import { Grid } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Grid, Typography, Button, Alert, Select, MenuItem, List, ListItem, ListItemText } from '@mui/material';
 
-// project-import
-import MainCard from 'ui-component/cards/MainCard';
-import MapContainerStyled from 'ui-component/third-party/map/MapContainerStyled';
+// version 1529
 
-import ClustersMap from './maps/clusters-map';
-import ChangeTheme from './maps/change-theme';
-import DraggableMarker from './maps/draggable-marker';
-import GeoJSONAnimation from './maps/GeoJSONAnimation';
-import Heatmap from './maps/heatmap';
-import HighlightByFilter from './maps/HighlightByFilter';
-import InteractionMap from './maps/interaction-map';
-import MarkersPopups from './maps/MarkersPopups';
-import SideBySide from './maps/side-by-side';
-import ViewportAnimation from './maps/viewport-animation';
+const Employeeuploadall = () => {
+  const [companies, setCompanies] = useState([]);
+  const [selectedCompany, setSelectedCompany] = useState('');
+  const [csvFile, setCSVFile] = useState(null);
+  const [updateSuccess, setUpdateSuccess] = useState(false);
+  const [employees, setEmployees] = useState([]);
 
-import { cities, countries } from 'data/location';
+  useEffect(() => {
+    fetchCompanies();
+  }, []);
 
-const MAPBOX_THEMES = {
-    light: 'mapbox://styles/mapbox/light-v10',
-    dark: 'mapbox://styles/mapbox/dark-v10',
-    streets: 'mapbox://styles/mapbox/streets-v11',
-    outdoors: 'mapbox://styles/mapbox/outdoors-v11',
-    satellite: 'mapbox://styles/mapbox/satellite-v9',
-    satelliteStreets: 'mapbox://styles/mapbox/satellite-streets-v11'
+  const fetchCompanies = () => {
+    fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/companies')
+      .then(response => response.json())
+      .then(data => {
+        if (data && data.data) {
+          setCompanies(data.data);
+        } else {
+          console.error('Unexpected data format:', data);
+        }
+      })
+      .catch(error => console.error('Error fetching companies:', error));
+  };
+
+  const handleCompanyChange = (event) => {
+    setSelectedCompany(event.target.value);
+  };
+
+  const handleCSVUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) {
+      alert('No file selected.');
+      return;
+    }
+    setCSVFile(file);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const csvData = event.target.result;
+      const employees = csvData.split('\n').slice(1).map((row) => row.trim()).filter((row) => row !== '');
+      const employeeRecords = employees.map((employee) => {
+        const [
+          fullname,
+          email,
+          jobtitle,
+          address,
+          hometel,
+          mobiletel,
+          dob,
+          ni,
+          startdate,
+          uniqueCode,
+          CompanyBranch,
+          VideoTile,
+          archive,
+          driving_license_number,
+          driving_license_expiry,
+        ] = employee.split(',').map((item) => item.trim());
+
+        return {
+          fullname,
+          email,
+          jobtitle,
+          address,
+          hometel,
+          mobiletel,
+          dob,
+          ni,
+          startdate,
+          uniqueCode,
+          CompanyBranch,
+          VideoTile,
+          archive: archive === 'Y' || archive === 'y' || archive === 'true',
+          driving_license_number,
+          driving_license_expiry,
+          company: selectedCompany,
+          exists: false,
+        };
+      });
+      setEmployees(employeeRecords);
+      checkEmployeeExists(employeeRecords);
+    };
+    reader.readAsText(file);
+  };
+
+  const checkEmployeeExists = (employeeRecords) => {
+    const emailPromises = employeeRecords.map((employee) => {
+      return fetch(`https://glowing-paradise-cfe00f2697.strapiapp.com/api/employees?filters[email][$eq]=${employee.email}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data && data.data && data.data.length > 0) {
+            return true;
+          } else {
+            return false;
+          }
+        })
+        .catch(error => console.error('Error checking employee existence:', error));
+    });
+
+    Promise.all(emailPromises)
+      .then((existsArray) => {
+        const updatedEmployees = employeeRecords.map((employee, index) => {
+          return { ...employee, exists: existsArray[index] };
+        });
+        setEmployees(updatedEmployees);
+      })
+      .catch((error) => console.error('Error checking employee existence:', error));
+  };
+
+  const handleCSVSubmit = () => {
+    if (csvFile && selectedCompany) {
+      const uniqueEmails = new Set();
+      const uniqueEmployees = employees.filter((employee) => {
+        if (uniqueEmails.has(employee.email) || employee.exists) {
+          return false;
+        }
+        uniqueEmails.add(employee.email);
+        return true;
+      });
+
+      const createPromises = uniqueEmployees.map((employee) => {
+        const data = { ...employee, company: selectedCompany };
+        delete data.exists;
+
+        return fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/employees', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ data }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              return response.json().then((error) => {
+                throw new Error(`HTTP ${response.status} - ${JSON.stringify(error)}`);
+              });
+            }
+            return response.json();
+          });
+      });
+
+      Promise.all(createPromises)
+        .then((data) => {
+          console.log('Employees created successfully:', data);
+          setUpdateSuccess(true);
+          setTimeout(() => {
+            setUpdateSuccess(false);
+          }, 3000);
+        })
+        .catch((error) => {
+          console.error('Error creating employees:', error);
+          // Handle the error scenario
+        });
+    }
+  };
+
+  return (
+    <Grid container spacing={2}>
+      <Grid item xs={12}>
+        <Typography variant="h6">Please upload a CSV file to add new employees</Typography>
+      </Grid>
+      <Grid item xs={12}>
+        <Select value={selectedCompany} onChange={handleCompanyChange}>
+          <MenuItem value="">Select a company</MenuItem>
+          {companies.map((company) => (
+            <MenuItem key={company.id} value={company.id}>
+              {company.attributes.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </Grid>
+      <Grid item xs={12}>
+        <input type="file" accept=".csv" onChange={handleCSVUpload} />
+      </Grid>
+      <Grid item xs={12}>
+        <List>
+          {employees.map((employee, index) => (
+            <ListItem key={index}>
+              <ListItemText
+                primary={`${employee.fullname}, ${employee.email}, ${employee.jobtitle}`}
+                style={{ color: employee.exists ? 'red' : 'inherit' }}
+              />
+            </ListItem>
+          ))}
+        </List>
+        {employees.length > 0 && (
+          <Typography variant="body1">
+            Employees highlighted in red are already in Strapi.
+          </Typography>
+        )}
+      </Grid>
+      <Grid item xs={12}>
+        <Button variant="contained" onClick={handleCSVSubmit} disabled={!csvFile || !selectedCompany}>
+          Submit these new employees?
+        </Button>
+        {updateSuccess && (
+          <Alert severity="success" style={{ marginTop: '1rem' }}>
+            Employees have been successfully created!
+          </Alert>
+        )}
+      </Grid>
+    </Grid>
+  );
 };
 
-const mapConfiguration = {
-    mapboxAccessToken: process.env.REACT_APP_MAPBOX_ACCESS_TOKEN,
-    minZoom: 1
-};
-
-// ==============================|| MAP ||============================== //
-
-const Map = () => {
-    const theme = useTheme();
-
-    return (
-        <Grid container spacing={3}>
-            <Grid item xs={12}>
-                <MainCard title="Theme Variants">
-                    <MapContainerStyled>
-                        <ChangeTheme {...mapConfiguration} themes={MAPBOX_THEMES} />
-                    </MapContainerStyled>
-                </MainCard>
-            </Grid>
-            <Grid item xs={12} md={6}>
-                <MainCard title="Markers & Popups">
-                    <MapContainerStyled>
-                        <MarkersPopups
-                            {...mapConfiguration}
-                            data={countries}
-                            mapStyle={theme.palette.mode === 'dark' ? MAPBOX_THEMES.dark : MAPBOX_THEMES.light}
-                        />
-                    </MapContainerStyled>
-                </MainCard>
-            </Grid>
-            <Grid item xs={12} md={6}>
-                <MainCard title="Draggable Marker">
-                    <MapContainerStyled>
-                        <DraggableMarker
-                            {...mapConfiguration}
-                            mapStyle={theme.palette.mode === 'dark' ? MAPBOX_THEMES.dark : MAPBOX_THEMES.light}
-                        />
-                    </MapContainerStyled>
-                </MainCard>
-            </Grid>
-            <Grid item xs={12}>
-                <MainCard title="Geo JSON Animation">
-                    <MapContainerStyled>
-                        <GeoJSONAnimation {...mapConfiguration} mapStyle={MAPBOX_THEMES.satelliteStreets} />
-                    </MapContainerStyled>
-                </MainCard>
-            </Grid>
-            <Grid item xs={12}>
-                <MainCard title="Clusters">
-                    <MapContainerStyled>
-                        <ClustersMap
-                            {...mapConfiguration}
-                            mapStyle={theme.palette.mode === 'dark' ? MAPBOX_THEMES.dark : MAPBOX_THEMES.light}
-                        />
-                    </MapContainerStyled>
-                </MainCard>
-            </Grid>
-            <Grid item xs={12}>
-                <MainCard title="Interaction">
-                    <MapContainerStyled>
-                        <InteractionMap
-                            {...mapConfiguration}
-                            mapStyle={theme.palette.mode === 'dark' ? MAPBOX_THEMES.dark : MAPBOX_THEMES.light}
-                        />
-                    </MapContainerStyled>
-                </MainCard>
-            </Grid>
-            <Grid item xs={12}>
-                <MainCard title="Viewport Animation">
-                    <MapContainerStyled>
-                        <ViewportAnimation
-                            {...mapConfiguration}
-                            data={cities.filter((city) => city.state === 'Gujarat')}
-                            mapStyle={MAPBOX_THEMES.outdoors}
-                        />
-                    </MapContainerStyled>
-                </MainCard>
-            </Grid>
-            <Grid item xs={12} md={6}>
-                <MainCard title="Highlight By Filter">
-                    <MapContainerStyled>
-                        <HighlightByFilter
-                            {...mapConfiguration}
-                            mapStyle={theme.palette.mode === 'dark' ? MAPBOX_THEMES.dark : MAPBOX_THEMES.light}
-                        />
-                    </MapContainerStyled>
-                </MainCard>
-            </Grid>
-            <Grid item xs={12} md={6}>
-                <MainCard title="Heatmap">
-                    <MapContainerStyled>
-                        <Heatmap
-                            {...mapConfiguration}
-                            mapStyle={theme.palette.mode === 'dark' ? MAPBOX_THEMES.dark : MAPBOX_THEMES.light}
-                        />
-                    </MapContainerStyled>
-                </MainCard>
-            </Grid>
-            <Grid item xs={12}>
-                <MainCard title="Side By Side">
-                    <MapContainerStyled>
-                        <SideBySide {...mapConfiguration} />
-                    </MapContainerStyled>
-                </MainCard>
-            </Grid>
-        </Grid>
-    );
-};
-
-export default Map;
+export default Employeeuploadall;

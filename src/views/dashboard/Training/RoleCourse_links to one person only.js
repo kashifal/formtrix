@@ -10,18 +10,10 @@ const SkillsCoursesHeatmap = () => {
       chart: {
         type: 'heatmap',
         events: {
-          dataPointSelection: (event, chartContext, config) => {
-            const skill = config.w.config.series[config.seriesIndex].name;
-            const courseIndex = config.w.config.series[config.seriesIndex].data[config.dataPointIndex].x;
-            const course = chartData.options.xaxis.categories[courseIndex];
-            
-            const encodedCompany = encodeURIComponent('Monks Training Services');
-            const encodedSkill = encodeURIComponent(skill);
-            const encodedCourse = encodeURIComponent(course);
-            const url = `/skill-report/${encodedCompany}/${encodedSkill}/${encodedCourse}/`; 
-            window.location.href = url;
-          }
-        }
+          click: () => {
+            window.location.href = '/full-report-monks';
+          },
+        },
       },
       dataLabels: {
         enabled: false,
@@ -81,6 +73,7 @@ const SkillsCoursesHeatmap = () => {
                   courses: {
                     data: skill.attributes.courses.data.map(course => ({
                       ...course,
+                      shortname: course.attributes.shortname,
                       completed: completedCourses.includes(course.id)
                     }))
                   }
@@ -109,7 +102,7 @@ const SkillsCoursesHeatmap = () => {
         skillsSet.add(skillName);
   
         skill.attributes.courses.data.forEach(course => {
-          const courseName = course.attributes.shortname;
+          const courseName = course.shortname;
           coursesSet.add(courseName);
           const key = `${skillName}|${courseName}`;
   

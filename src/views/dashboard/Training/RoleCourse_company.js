@@ -10,18 +10,10 @@ const SkillsCoursesHeatmap = () => {
       chart: {
         type: 'heatmap',
         events: {
-          dataPointSelection: (event, chartContext, config) => {
-            const skill = config.w.config.series[config.seriesIndex].name;
-            const courseIndex = config.w.config.series[config.seriesIndex].data[config.dataPointIndex].x;
-            const course = chartData.options.xaxis.categories[courseIndex];
-            
-            const encodedCompany = encodeURIComponent('Monks Training Services');
-            const encodedSkill = encodeURIComponent(skill);
-            const encodedCourse = encodeURIComponent(course);
-            const url = `/skill-report/${encodedCompany}/${encodedSkill}/${encodedCourse}/`; 
-            window.location.href = url;
-          }
-        }
+          click: () => {
+            window.location.href = '/full-report-monks';
+          },
+        },
       },
       dataLabels: {
         enabled: false,
@@ -62,7 +54,8 @@ const SkillsCoursesHeatmap = () => {
 
   useEffect(() => {
     const fetchEmployeesAndCourses = async () => {
-      const response = await axios.get(`https://glowing-paradise-cfe00f2697.strapiapp.com/api/employees?filters[company][name][$eq]=Monks Training Services&populate=skills.courses`);
+      const companyId = 7; // Filter employees by company ID 7
+      const response = await axios.get(`https://glowing-paradise-cfe00f2697.strapiapp.com/api/employees?filters[company][id][$eq]=${companyId}&populate=skills.courses`);
       const employeesData = response.data.data;
 
       const employeesWithCourseCompletion = await Promise.all(employeesData.map(async (employee) => {
@@ -81,6 +74,7 @@ const SkillsCoursesHeatmap = () => {
                   courses: {
                     data: skill.attributes.courses.data.map(course => ({
                       ...course,
+                      shortname: course.attributes.shortname,
                       completed: completedCourses.includes(course.id)
                     }))
                   }

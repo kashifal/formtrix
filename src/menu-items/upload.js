@@ -18,44 +18,59 @@ const icons = {
 
 // ==============================|| APPLICATION MENU ITEMS ||============================== //
 
-const application = {
-    id: 'application',
-    title: <FormattedMessage id="Training Detail" />,
+const upload = {
+    id: 'upload',
+    title: <FormattedMessage id="Add Data" />,
     icon: icons.IconApps,
     type: 'group',
     children: [
         
-        {
-            id: 'chat',
-            title: <FormattedMessage id="Company" />,
+/*         {
+            id: 'Company',
+            title: <FormattedMessage id="Add Company" />,
             type: 'item',
             icon: icons.IconUserCheck,
             url: '/apps/chat'
-        },
+        }, */
         {
-            id: 'kanban',
-            title: 'Courses',
+            id: 'certificates',
+            title: 'Add Certificates',
             type: 'item',
             icon: icons.IconUserCheck,
             url: '/apps/kanban/board'
         },
         {
             id: 'mail',
-            title: <FormattedMessage id="Skills" />,
+            title: <FormattedMessage id="Bulk Upload" />,
             type: 'item',
             icon: icons.IconUserCheck,
             url: '/apps/mail'
         },
-        {
-            id: 'calendar',
-            title: <FormattedMessage id="Calendar" />,
+/*         {
+            id: 'staff',
+            title: <FormattedMessage id="Upload Courses" />,
             type: 'item',
-            url: '/apps/calendar',
+            icon: icons.IconUserCheck,
+            url: '/apps/add-staff'
+        }, */
+        {
+            id: 'courses',
+            title: <FormattedMessage id="Add Courses" />,
+            type: 'item',
+            url: '/components/autocomplete',
             icon: icons.IconUserCheck,
             breadcrumbs: false
         },
+        {
+            id: 'util-grid',
+            title: <FormattedMessage id="Manage Induction" />,
+            type: 'item',
+            url: '/utils/util-grid',
+            icon: icons.IconLayoutKanban,
+            breadcrumbs: false
+        }
       
     ]
 };
 
-export default application;
+export default upload;

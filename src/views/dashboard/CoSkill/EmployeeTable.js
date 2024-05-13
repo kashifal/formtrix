@@ -72,15 +72,15 @@ const EmployeeTable = ({ company, skill }) => {
 
   return (
     <div>
-      <DataGridPro
-        rows={tableData}
-        columns={columns}
-        pageSize={5}
-        checkboxSelection
-        loading={loading}
-        height={400}
-        style={{ height: '100%', flexGrow: 1 }}
-      />
+<DataGridPro
+    rows={tableData}
+    columns={columns}
+    pageSize={5}
+    loading={loading}
+    height={400}
+    style={{ height: '100%', flexGrow: 1 }}
+/>
+
     </div>
   );
 };
