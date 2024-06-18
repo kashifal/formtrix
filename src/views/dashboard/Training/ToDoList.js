@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CardActions, CardContent, Checkbox, Divider, Fab, FormControlLabel, Grid, TextField, IconButton } from '@mui/material';
+import { CardActions, CardContent, Checkbox, Divider, Fab, FormControlLabel, Grid, TextField, IconButton, MenuItem } from '@mui/material';
 import MainCard from 'ui-component/cards/MainCard';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -16,24 +16,41 @@ const api = (endpoint, method = 'GET', body = null) => {
 
 const ToDoList = ({ isLoading }) => {
   const [todos, setTodos] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [newTodoTitle, setNewTodoTitle] = useState('');
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState('');
 
   useEffect(() => {
-    api('/todos').then(data => {
+    // Fetch employees
+    api('/employees?fields[0]=fullname').then(data => {
       if (data.data) {
-        setTodos(data.data);
+        setEmployees(data.data);
       } else {
-        console.error('Unexpected API response format');
-        setTodos([]); // Set todos to an empty array as a fallback
+        console.error('Unexpected API response format for employees');
+        setEmployees([]); // Set employees to an empty array as a fallback
       }
     });
   }, []);
+
+  useEffect(() => {
+    // Fetch todos based on the selected employee
+    const endpoint = selectedEmployeeId ? `/todos?populate[employee][fields][0]=fullname&filters[employee][id][$eq]=${selectedEmployeeId}` : '/todos?populate[employee][fields][0]=fullname';
+    api(endpoint).then(data => {
+      if (data.data) {
+        setTodos(data.data);
+      } else {
+        console.error('Unexpected API response format for todos');
+        setTodos([]); // Set todos to an empty array as a fallback
+      }
+    });
+  }, [selectedEmployeeId]);
 
   const addTodo = () => {
     api('/todos', 'POST', {
       data: {
         title: newTodoTitle,
-        completed: false
+        completed: false,
+        employee: selectedEmployeeId
       }
     }).then(newTodo => {
       if (newTodo.data) {
@@ -70,6 +87,22 @@ const ToDoList = ({ isLoading }) => {
           <p>Loading...</p>
         ) : (
           <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                select
+                label="Select Employee"
+                value={selectedEmployeeId}
+                onChange={(e) => setSelectedEmployeeId(e.target.value)}
+              >
+                <MenuItem value="">All Employees</MenuItem>
+                {employees.map((employee) => (
+                  <MenuItem key={employee.id} value={employee.id}>
+                    {employee.attributes.fullname}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
             {todos.map((todo) => (
               <Grid item xs={12} key={todo.id}>
                 <Grid container alignItems="center">
@@ -83,7 +116,7 @@ const ToDoList = ({ isLoading }) => {
                           color="primary"
                         />
                       }
-                      label={todo.attributes.title}
+                      label={`${todo.attributes.title} - ${todo.attributes.employee?.data?.attributes?.fullname || 'No employee assigned'}`}
                     />
                   </Grid>
                   <Grid item>
@@ -115,7 +148,7 @@ const ToDoList = ({ isLoading }) => {
       <CardActions>
         <Grid container direction="row-reverse">
           <Grid item>
-            <Fab size="small" color="primary" aria-label="add" onClick={() => newTodoTitle.trim() !== '' && addTodo()}>
+            <Fab size="small" color="primary" aria-label="add" onClick={() => newTodoTitle.trim() !== '' && selectedEmployeeId && addTodo()}>
               <AddRoundedIcon />
             </Fab>
           </Grid>

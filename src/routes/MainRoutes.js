@@ -5,6 +5,7 @@ import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 import AuthGuard from 'utils/route-guard/AuthGuard';
 
+
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 const DashboardAnalytics = Loadable(lazy(() => import('views/dashboard/Analytics')));
@@ -46,6 +47,7 @@ const AppKanban = Loadable(lazy(() => import('views/application/kanban')));
 const AppKanbanBacklogs = Loadable(lazy(() => import('views/application/kanban/Backlogs')));
 const AppKanbanBoard = Loadable(lazy(() => import('views/application/kanban/Board')));
 const AppMail = Loadable(lazy(() => import('views/application/mail')));
+const AppUpload = Loadable(lazy(() => import('views/application/bulkupload')));
 const AddStaff = Loadable(lazy(() => import('views/application/add-staff')));
 const AppCalendar = Loadable(lazy(() => import('views/application/calendar')));
 const AppContactCard = Loadable(lazy(() => import('views/application/contact/Card')));
@@ -135,13 +137,21 @@ const UtilsColor = Loadable(lazy(() => import('views/utilities/Color')));
 const UtilsShadow = Loadable(lazy(() => import('views/utilities/Shadow')));
 const UtilsAnimation = Loadable(lazy(() => import('views/utilities/Animation')));
 const UtilsGrid = Loadable(lazy(() => import('views/utilities/Grid')));
+const UtilsEdit = Loadable(lazy(() => import('views/utilities/editinduction')));
 
 // sample page routing
 const SamplePage = Loadable(lazy(() => import('views/sample-page')));
+const Skills = Loadable(lazy(() => import('views/skills')));
 const SkillCompany = Loadable(lazy(() => import('views/skill-company')));
 const SkillReport = Loadable(lazy(() => import('views/skill-report')));
+const EmployeeSkill = Loadable(lazy(() => import('views/employee-skill')));                 4
 const FullReport = Loadable (lazy(() => import('views/full-report-monks')));
 const Employee = Loadable(lazy(() => import('views/employee')));
+const Employeefilter = Loadable(lazy(() => import('views/employeefilter')));
+const Foxtable = Loadable(lazy(() => import('views/foxtable')));
+const Reports = Loadable(lazy(() => import('views/reports')));
+const Foxskills = Loadable(lazy(() => import('views/foxskills')));
+
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -225,6 +235,10 @@ const MainRoutes = {
         {
             path: '/apps/mail',
             element: <AppMail />
+        },
+        {
+            path: '/apps/bulkupload',
+            element: <AppUpload />
         },
         {
             path: '/apps/add-staff',
@@ -510,19 +524,35 @@ const MainRoutes = {
             element: <UtilsGrid />
         },
         {
+            path: '/utils/edit-induction',
+            element: <UtilsEdit /> 
+        },
+        {
             path: '/sample-page',
             element: <SamplePage />
         },
         {
+            path: '/skills',
+            element: <Skills />
+        },
+        {
             path: '/skill-company',
-            element: <SkillCompany /> 
+            element: <SkillCompany />
         },
         {
             path: '/full-report-monks',
             element: <FullReport />
         },
         {
-            path: '/skill-report/:companyId/:skillId/:courseId',   // New route    
+            path: '/skill-report/:companyId/:skillId/:courseId',   
+            element: <SkillReport />    
+        },
+        {
+            path: '/skill-report/:companyId/:skillId',  
+            element: <SkillReport />    
+        },
+        {
+            path: '/skill-report/:companyId',   
             element: <SkillReport />    
         },
         {
@@ -530,13 +560,56 @@ const MainRoutes = {
             element: <SkillReport />
         },
         {
-            path: '/employee/:skillId/:companyId',
+            path: '/employee-skill/:companyId/:skillId',
+            element: <EmployeeSkill />
+        },
+        {
+            path: '/employee-skill/:companyId',
+            element: <EmployeeSkill />
+        },
+        {
+            path: '/employee-skill',
+            element: <EmployeeSkill />,
+        },
+        {
+            path: '/employee/:Id/:companyId',
             element: <Employee />
+        },
+        {
+            path: '/employee/:Id',
+            element: <Employee />   
         },
         {
             path: '/employee',
             element: <Employee />
         },
+        {
+            path: '/employeefilter',
+            element: <Employeefilter />     
+        },
+        {
+            path: '/foxtable',
+            element: <Foxtable />
+        },
+        {
+            path: '/reports',
+            element: <Reports />
+        },
+        {
+            path: '/foxskills/:companyId/:skillId',
+            element: <Foxskills />
+        },
+
+        {
+            path: '/foxskills/:companyId',
+            element: <Foxskills />  
+        },
+
+        {
+            path: '/foxskills',
+            element: <Foxskills />
+        },
+
         {
             path: '/dashboard/default',
             element: <DashboardDefault />
@@ -579,12 +652,12 @@ const MainRoutes = {
           },
 
           {
-            path: '/dashboard/employee/:id/:course/:companyId',
+            path: '/dashboard/employee/:id/:courseId/:companyId',
             element: <DashboardEmployee />
           },
 
           {
-            path: '/dashboard/employee/:id/:course',
+            path: '/dashboard/employee/:id/:courseId',
             element: <DashboardEmployee />
           },
 

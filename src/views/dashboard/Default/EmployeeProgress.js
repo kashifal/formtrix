@@ -41,7 +41,10 @@ const EmployeeTable = () => {
               mobiletel: attributes.mobiletel,
               startdate: new Date(attributes.startdate).toLocaleDateString('en-GB'),
               companyBranch: attributes.CompanyBranch,
-              completedCourses,
+              completedCourses: completedCourses.map(course => ({
+                ...course,
+                shortname: course.attributes.course.data.attributes.shortname
+              })),
             };
           }));
 
@@ -124,13 +127,20 @@ const EmployeeTable = () => {
 
   const handleRowClick = (params) => {
     const employeeId = params.row.id;
-    navigate(`/dashboard/employee/${employeeId}`, { replace: true });
+    const completedCourse = params.row.completedCourses.find((course) => course.attributes.course.data.attributes.name === selectedCourse);
+    const courseShortname = completedCourse ? completedCourse.shortname : null;
+    
+    if (courseShortname) {
+      navigate(`/dashboard/employee/${employeeId}/${courseShortname.trim()}`, { replace: true });
+    } else {
+      navigate(`/dashboard/employee/${employeeId}`, { replace: true });
+    }
   };
 
   return (
     <div>
       <div>
-        <span>Please choose course:</span>
+        <span>Please choose course before clicking on a name:</span>
         <Select value={selectedCourse} onChange={handleCourseChange}>
           <MenuItem value="">All Courses</MenuItem>
           {courses.map((course) => (
@@ -141,15 +151,15 @@ const EmployeeTable = () => {
         </Select>
       </div>
       <DataGridPro
-  rows={filteredData}
-  columns={columns}
-  pageSize={5}
-  loading={loading}
-  height={400}
-  style={{ height: '100%', flexGrow: 1 }}
-  getRowClassName={getRowClassName}
-  onRowClick={handleRowClick}
-/>
+        rows={filteredData}
+        columns={columns}
+        pageSize={5}
+        loading={loading}
+        height={400}
+        style={{ height: '100%', flexGrow: 1 }}
+        getRowClassName={getRowClassName}
+        onRowClick={handleRowClick}
+      />
     </div>
   );
 };

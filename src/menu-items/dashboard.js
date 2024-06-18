@@ -38,7 +38,7 @@ const dashboard = {
             id: 'training',
             title: <FormattedMessage id="My Company" />,
             type: 'item',
-            url: '/dashboard/training',
+            url: '/dashboard/training/3',
             icon: icons.IconChartInfographic,
             breadcrumbs: false
         

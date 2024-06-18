@@ -1,216 +1,131 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Typography, MenuItem, FormControl, Select, Box } from '@mui/material';
-import MainCard from 'ui-component/cards/MainCard';
-import Chart from 'react-apexcharts';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import Chart from "react-apexcharts";
 
-const SkillsByCo = () => {
-  // Initialize state variables with appropriate default values
-  const [companies, setCompanies] = useState([]);
-  const [selectedCompany, setSelectedCompany] = useState('Monks Training Services');
-  const [employees, setEmployees] = useState([]);
-  const [chartData, setChartData] = useState({
-    options: {
-      chart: {
-        type: 'heatmap',
-        events: {
-          dataPointSelection: (event, chartContext, config) => {
-            console.log('Selected data point:', config.w.config.series[config.seriesIndex].data[config.dataPointIndex]);
-            const courseIndex = config.w.config.series[config.seriesIndex].data[config.dataPointIndex].x;
-            console.log('Course Index:', courseIndex);
-            console.log('Categories:', chartData.options.xaxis.categories);
-
-            
-
-            const url = `/full-report-monks`; 
-            window.location.href = url; // Or use your routing method
-          }
-        }
-      },
-      dataLabels: {
-        enabled: false,
-      },
-      xaxis: {
-        type: 'category',
-        categories: [],
-      },
-      yaxis: {
-        type: 'category',
-        categories: [],
-      },
-      plotOptions: {
-        heatmap: {
-          colorScale: {
-            ranges: [{
-              from: 0,
-              to: 0,
-              name: 'Not Started',
-              color: '#ff4560' // Red
-            }, {
-              from: 1,
-              to: 1,
-              name: 'In Progress',
-              color: '#f9c802' // Yellow
-            }, {
-              from: 2,
-              to: 2,
-              name: 'Fully Trained',
-              color: '#00e396' // Green
-            }]
-          }
-        }
-      },
-      title: {
-        text: 'Skills and Courses Completion',
-      },
-    },
-    series: [],
-  });
+const HeatmapComponent = () => {
+  const [skills, setSkills] = useState([]);
+  const [heatmapSeries, setHeatmapSeries] = useState([]);
 
   useEffect(() => {
-    const fetchCompanies = async () => {
-      const response = await axios.get('https://glowing-paradise-cfe00f2697.strapiapp.com/api/companies?fields=name&populate=name');
-      setCompanies(response.data.data);
+    const fetchData = async () => {
+      const companiesResponse = await axios.get(
+        "https://glowing-paradise-cfe00f2697.strapiapp.com/api/companies?populate=*"
+      );
+      const skillsResponse = await axios.get(
+        "https://glowing-paradise-cfe00f2697.strapiapp.com/api/skills?populate=*"
+      );
+      const employeeCoursesResponse = await axios.get(
+        "https://glowing-paradise-cfe00f2697.strapiapp.com/api/employee-courses?populate=*"
+      );
+
+      const companiesData = companiesResponse.data.data;
+      const skillsData = skillsResponse.data.data;
+      const employeeCoursesData = employeeCoursesResponse.data.data;
+
+      setSkills(skillsData);
+
+      processHeatmapData(companiesData, skillsData, employeeCoursesData);
     };
 
-    fetchCompanies();
+    fetchData();
   }, []);
 
-  useEffect(() => {
-    if (selectedCompany) {
-      const fetchEmployeesAndCourses = async () => {
-        const response = await axios.get(`https://glowing-paradise-cfe00f2697.strapiapp.com/api/employees?filters[company][name][$eq]=${selectedCompany}&populate=skills.courses`);
-        const employeesData = response.data.data;
+  const processHeatmapData = (companies, skills, employeeCourses) => {
+    const data = {};
 
-        const employeesWithCourseCompletion = await Promise.all(employeesData.map(async (employee) => {
-          const employeeCoursesRes = await axios.get(`https://glowing-paradise-cfe00f2697.strapiapp.com/api/employee-courses?filters[employee][id][$eq]=${employee.id}&populate=*`);
-          const completedCourses = employeeCoursesRes.data.data.filter(ec => ec.attributes.DateCompleted !== null).map(ec => ec.attributes.course.data.id);
-
-          return { 
-            ...employee, 
-            attributes: { 
-              ...employee.attributes, 
-              skills: { 
-                data: employee.attributes.skills.data.map(skill => ({
-                  ...skill,
-                  attributes: {
-                    ...skill.attributes,
-                    courses: {
-                      data: skill.attributes.courses.data.map(course => ({
-                        ...course,
-                        completed: completedCourses.includes(course.id)
-                      }))
-                    }
-                  }
-                }))
-              }
-            }
-          };
-        }));
-
-        setEmployees(employeesWithCourseCompletion);
-      };
-
-      fetchEmployeesAndCourses();
-    } else {
-      setEmployees([]);
-    }
-  }, [selectedCompany]);
-
-  useEffect(() => {
-    const skillsSet = new Set();
-    const coursesSet = new Set();
-    const employeesPerSkill = {};
-    const completionCountPerCourse = {};
-  
-    // Track skills, courses, and completion status
-    employees.forEach(employee => {
-      employee.attributes.skills.data.forEach(skill => {
-        const skillName = skill.attributes.role;
-        skillsSet.add(skillName);
-  
-        skill.attributes.courses.data.forEach(course => {
-          const courseName = course.attributes.shortname; // Use the shortname
-          coursesSet.add(courseName);
-          const key = `${skillName}|${courseName}`;
-  
-          // Initialize tracking objects
-          if (!employeesPerSkill[skillName]) employeesPerSkill[skillName] = new Set();
-          if (!completionCountPerCourse[key]) completionCountPerCourse[key] = { completed: 0, total: 0 };
-  
-          employeesPerSkill[skillName].add(employee.id);
-          completionCountPerCourse[key].total = employeesPerSkill[skillName].size;
-          if (course.completed) {
-            completionCountPerCourse[key].completed += 1;
-          }
-        });
+    // Initialize the data structure
+    companies.forEach((company) => {
+      data[company.attributes.name] = {};
+      skills.forEach((skill) => {
+        data[company.attributes.name][skill.attributes.name] = 0;
       });
     });
-  
-    // Determine course completion status for each skill
-    const dataMap = {};
-    for (const [key, { completed, total }] of Object.entries(completionCountPerCourse)) {
-      dataMap[key] = completed === 0 ? 0 : (completed === total ? 2 : 1);
-    }
-  
-    // Convert sets to arrays for chart categories
-    const skills = Array.from(skillsSet);
-    const courses = Array.from(coursesSet);
-    const series = skills.map(skill => ({
-      name: skill,
-      data: courses.map(course => {
-        const key = `${skill}|${course}`;
-        return dataMap[key] || 0;
-      }),
-    }));
-  
-    setChartData(prevState => ({
-      ...prevState,
-      options: {
-        ...prevState.options,
-        xaxis: { ...prevState.options.xaxis, categories: courses },
-        yaxis: { ...prevState.options.yaxis, categories: skills },
-      },
-      series,
-    }));
-  }, [employees]); 
 
-  const handleCompanyChange = (event) => {
-    setSelectedCompany(event.target.value);
+    // Count course completions
+    employeeCourses.forEach((course) => {
+      const { employee, DateCompleted } = course.attributes;
+      if (DateCompleted) {
+        const companyName =
+          employee.data.attributes.company.data.attributes.name;
+        const skillName = employee.data.attributes.skill.data.attributes.name;
+        data[companyName][skillName] += 1;
+      }
+    });
+
+    const series = companies.map((company) => {
+      return {
+        name: company.attributes.name,
+        data: skills.map((skill) => data[company.attributes.name][skill.attributes.name]),
+      };
+    });
+
+    setHeatmapSeries(series);
+  };
+
+  const options = {
+    chart: {
+      type: "heatmap",
+    },
+    plotOptions: {
+      heatmap: {
+        shadeIntensity: 0.5,
+        colorScale: {
+          ranges: [
+            {
+              from: 0,
+              to: 0,
+              name: "No Completions",
+              color: "#e0e0e0",
+            },
+            {
+              from: 1,
+              to: 5,
+              name: "1-5 Completions",
+              color: "#00A100",
+            },
+            {
+              from: 6,
+              to: 10,
+              name: "6-10 Completions",
+              color: "#128FD9",
+            },
+            {
+              from: 11,
+              to: 15,
+              name: "11-15 Completions",
+              color: "#FFB200",
+            },
+            {
+              from: 16,
+              to: 20,
+              name: "16-20 Completions",
+              color: "#FF0000",
+            },
+          ],
+        },
+      },
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    xaxis: {
+      categories: skills.map((skill) => skill.attributes.name),
+    },
+    title: {
+      text: "Company Course Completion Heatmap",
+    },
   };
 
   return (
-    <MainCard title="Skills and Courses Report">
-      <Typography variant="body2" sx={{ mb: 2 }}>
-        Select a company to view its employees, their skills, and related courses including completion status.
-      </Typography>
-      <FormControl fullWidth>
-        <Select
-          value={selectedCompany}
-          onChange={handleCompanyChange}
-          displayEmpty
-          inputProps={{ 'aria-label': 'Without label' }}
-        >
-          <MenuItem value="">
-            <em>Choose a company</em>
-          </MenuItem>
-          {companies.map((company) => (
-            <MenuItem key={company.id} value={company.attributes.name}>
-              {company.attributes.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <Box sx={{ mt: 3 }}>
-        <Chart
-          options={chartData.options}
-          series={chartData.series}
-          type="heatmap"
-          height={350}
-        />
-      </Box>
-    </MainCard>
+    <div>
+      <Chart
+        options={options}
+        series={heatmapSeries}
+        type="heatmap"
+        height="450"
+      />
+    </div>
   );
 };
 
-export default SkillsByCo;
+export default HeatmapComponent;

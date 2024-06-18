@@ -49,6 +49,8 @@ class HeatMapChart extends Component {
         },
       },
       series: [],
+      companyIds: {},
+      skillIds: {},
     };
 
     this.handleLabelClick = this.handleLabelClick.bind(this);
@@ -56,14 +58,24 @@ class HeatMapChart extends Component {
 
   async componentDidMount() {
     try {
-      const [companyNames, skillNames] = await Promise.all([
-        this.loadCompanyNames(),
-        this.loadSkillNames(),
+      const [companies, skills] = await Promise.all([
+        this.loadCompanies(),
+        this.loadSkills(),
       ]);
 
-      const seriesPromises = companyNames.map(async (companyName) => {
-        const skillDataPromises = skillNames.map(async (skillName) => {
-          const employees = await this.fetchEmployeesByCompanyAndSkill(companyName, skillName);
+      const companyIds = {};
+      companies.forEach(company => {
+        companyIds[company.attributes.website] = company.id;
+      });
+
+      const skillIds = {};
+      skills.forEach(skill => {
+        skillIds[skill.attributes.role] = skill.id;
+      });
+
+      const seriesPromises = companies.map(async (company) => {
+        const skillDataPromises = skills.map(async (skill) => {
+          const employees = await this.fetchEmployeesByCompanyAndSkill(company.attributes.website, skill.attributes.role);
           const completedEmployees = await Promise.all(
             employees.map(async (employee) => {
               const courses = await this.fetchEmployeeCourses(employee.id);
@@ -74,32 +86,32 @@ class HeatMapChart extends Component {
           const allEmployeesCompleted = completedEmployees.every((completed) => completed);
 
           return {
-            x: skillName,
+            x: skill.attributes.role,
             y: allEmployeesCompleted ? 0 : 70,
           };
         });
 
         return {
-          name: companyName,
+          name: company.attributes.website,
           data: await Promise.all(skillDataPromises),
         };
       });
 
       const series = await Promise.all(seriesPromises);
-      this.setState({ series });
+      this.setState({ series, companyIds, skillIds });
     } catch (err) {
       console.error("Error loading data:", err);
     }
   }
 
-  loadCompanyNames() {
+  loadCompanies() {
     return axios.get("https://glowing-paradise-cfe00f2697.strapiapp.com/api/companies/")
-      .then(response => response.data.data.map(company => company.attributes.website));
+      .then(response => response.data.data);
   }
 
-  loadSkillNames() {
+  loadSkills() {
     return axios.get("https://glowing-paradise-cfe00f2697.strapiapp.com/api/skills/")
-      .then(response => response.data.data.map(skill => skill.attributes.role));
+      .then(response => response.data.data);
   }
 
   async fetchEmployeesByCompanyAndSkill(companyName, skillName) {
@@ -121,39 +133,42 @@ class HeatMapChart extends Component {
       };
     });
   }
-  
+
   handleDataPointSelection(event, chartContext, config) {
     const companyName = config.w.config.series[config.seriesIndex].name;
     const skillName = config.w.config.series[config.seriesIndex].data[config.dataPointIndex].x;
-    const url = `/dashboard/CoSkill/${companyName}/${skillName}/`;
+    const companyId = this.state.companyIds[companyName];
+    const skillId = this.state.skillIds[skillName];
+    const url = `/foxskills/${companyId}/${skillId}`;
     window.location.href = url;
   }
-  
-    handleLabelClick(company) {
-      this.props.history.push(`/${company.toLowerCase()}`);
-    }
-  
-    render() {
-      const { series } = this.state;
-  
-      return (
-        <div className="mixed-chart" style={{ width: '100%' }}>
-          {series.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: 20 }}>
-              <p>Thanks for waiting, we are digging out your records...</p>
-              <img src="/images/constructionwork.gif" alt="Construction Work" />
-            </div>
-          ) : (
-            <Chart
-              options={this.state.options}
-              series={series}
-              type="heatmap"
-              width="100%"
-            />
-          )}
-        </div>
-      );
-    }
+
+  handleLabelClick(company) {
+    const companyId = this.state.companyIds[company];
+    this.props.history.push(`/foxskills/${companyId}`);
   }
-  
-  export default HeatMapChart;
+
+  render() {
+    const { series } = this.state;
+
+    return (
+      <div className="mixed-chart" style={{ width: '100%' }}>
+        {series.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: 20 }}>
+            <p>Thanks for waiting, we are digging out your records...</p>
+            <img src="/images/constructionwork.gif" alt="Construction Work" />
+          </div>
+        ) : (
+          <Chart
+            options={this.state.options}
+            series={series}
+            type="heatmap"
+            width="100%"
+          />
+        )}
+      </div>
+    );
+  }
+}
+
+export default HeatMapChart;

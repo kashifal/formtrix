@@ -161,10 +161,10 @@ const Training = () => {
         </Button>
       </Grid>
 
-      {/* HeatMapChart Row */}
+      {/* HeatMapChart Row  - now passes company details MT*/}
       <Grid item xs={12}>
         {showHeatMapChart ? (
-          isMonksTraining ? <HeatMapChart /> : <HeatMapChartCompany />
+          isMonksTraining ? <HeatMapChart companyId={companyId} /> : <HeatMapChartCompany companyId={companyId} />
         ) : (
           isMonksTraining ? <RoleCourseChart /> : <RoleCourseChartCompany />
         )}
@@ -176,9 +176,11 @@ const Training = () => {
           <p>Loading employee details...</p>
         ) : employeeData.length > 0 ? (
           <ul>
-            {employeeData.map((employee) => (
-              <li key={employee.id}>{employee.attributes.name}</li>
-            ))}
+            {employeeData
+              .filter(employee => employee.attributes && employee.attributes.name)
+              .map((employee) => (
+                <li key={employee.id}>{employee.attributes.name}</li>
+              ))}
           </ul>
         ) : (
           <p>No employee data available.</p>

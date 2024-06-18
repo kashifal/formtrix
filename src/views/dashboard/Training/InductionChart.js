@@ -14,7 +14,7 @@ const pieChartOptions = {
     height: 450
   },
   labels: ['Completed', 'Started', 'Not Started'],
-  colors: ['#007958', '#f9c809', '#ff9999'],
+  colors: ['#007958', '#f9c809', '#b80a2d'],
   legend: {
     show: true,
     fontFamily: `'Roboto', sans-serif`,
@@ -55,10 +55,12 @@ const pieChartOptions = {
 const InductionChart = () => {
   const theme = useTheme();
   const { navType } = useConfig();
+
   const { primary } = theme.palette.text;
   const darkLight = theme.palette.dark.light;
   const grey200 = theme.palette.grey[200];
   const backColor = theme.palette.background.paper;
+
   const [series] = useState([10, 20, 70]);
   const [options, setOptions] = useState(pieChartOptions);
 

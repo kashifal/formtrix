@@ -20,26 +20,20 @@ const SkillCompany = {
     icon: icons.IconBrandChrome,
     type: 'group',
     children: [
-        {
-            id: 'skill-company',
-            title: <FormattedMessage id="Skills by Company" />,
+
+/*         {
+            id: 'skills',
+            title: <FormattedMessage id="Company Skills Report" />,
             icon: icons.IconBrandChrome,
             type: 'item',
-            url: '/skill-company',
-        },
-        {
-            id: 'sample-page',
-            title: <FormattedMessage id="Skills Report" />,
-            icon: icons.IconBrandChrome,
-            type: 'item',
-            url: '/sample-page',
-        },
+            url: '/skills',
+        }, */
         {
             id: 'full-report-monks',
             title: <FormattedMessage id="Full Report MTS" />,
             icon: icons.IconBrandChrome,
             type: 'item',
-            url: '/full-report-monks',
+            url: '/foxskills/3',
         },
         {
             id: 'employee',
@@ -54,6 +48,13 @@ const SkillCompany = {
             icon: icons.IconStairsUp,
             type: 'item',
             url: '/forms/forms-wizard',
+        },
+        {
+            id: 'employee-filter',
+            title: <FormattedMessage id="Filter Employees" />,
+            icon: icons.IconUserCheck,
+            type: 'item',
+            url: '/employeefilter',
         }
 
 

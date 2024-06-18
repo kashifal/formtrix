@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Box } from '@mui/material';
 import Chart from 'react-apexcharts';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 
 const SkillsCoursesHeatmap = () => {
   const [employees, setEmployees] = useState([]);
@@ -24,6 +24,7 @@ const SkillsCoursesHeatmap = () => {
       },
       plotOptions: {
         heatmap: {
+         shadeIntensity: 1,
           colorScale: {
             ranges: [{
               from: 0,
@@ -51,20 +52,11 @@ const SkillsCoursesHeatmap = () => {
           return `<div>${skill}: ${course}</div>`;
         }
       },
-      events: {
-        click: (event, chartContext, config) => {
-          const seriesIndex = config.seriesIndex;
-          const dataPointIndex = config.dataPointIndex;
-          const skillId = employees[seriesIndex].attributes.skills.data[dataPointIndex].id;
-          const companyId = employees[seriesIndex].attributes.company.data.id;
-          navigate(`/dashboard/skill/${skillId}/${companyId}`);
-        },
-      }
     },
     series: [],
   });
 
-  const navigate = useNavigate();  // Initialize navigate function
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchEmployeesAndCourses = async () => {
@@ -109,12 +101,14 @@ const SkillsCoursesHeatmap = () => {
     const coursesSet = new Set();
     const employeesPerSkill = {};
     const completionCountPerCourse = {};
+    const skillCourseMap = {};
 
     employees.forEach(employee => {
       employee.attributes.skills.data.forEach(skill => {
         const skillName = skill.attributes.role;
         skillsSet.add(skillName);
-
+        const skillId = skill.id;
+  
         skill.attributes.courses.data.forEach(course => {
           const courseName = course.attributes.shortname;
           coursesSet.add(courseName);
@@ -128,6 +122,8 @@ const SkillsCoursesHeatmap = () => {
           if (course.completed) {
             completionCountPerCourse[key].completed += 1;
           }
+
+          skillCourseMap[key] = { skillId, companyId: employee.attributes.company.data.id };
         });
       });
     });
@@ -153,10 +149,21 @@ const SkillsCoursesHeatmap = () => {
         ...prevState.options,
         xaxis: { ...prevState.options.xaxis, categories: courses },
         yaxis: { ...prevState.options.yaxis, categories: skills },
+        chart: {
+          ...prevState.options.chart,
+          events: {
+            click: (event, chartContext, config) => {
+              const skill = skills[config.seriesIndex];
+              const course = courses[config.dataPointIndex];
+              const { skillId, companyId } = skillCourseMap[`${skill}|${course}`];
+              navigate(`/skill-report/${companyId}/${skillId}`);
+            },
+          },
+        },
       },
       series,
     }));
-  }, [employees]);
+  }, [employees, navigate]);
 
   return (
     <Box>

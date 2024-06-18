@@ -32,7 +32,7 @@ const reports = {
             id: 'grid',
             title: <FormattedMessage id="Table Report" />,
             type: 'item',
-            url: '/advance/alert',
+            url: '/reports',
             icon: icons.IconDeviceAnalytics,
             breadcrumbs: false
         }

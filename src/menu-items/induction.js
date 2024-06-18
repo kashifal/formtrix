@@ -45,10 +45,10 @@ const dashboard = {
 
         },
         {
-            id: 'util-grid',
+            id: 'edit-induction',
             title: <FormattedMessage id="Induction Pages" />,
             type: 'item',
-            url: '/utils/util-grid',
+            url: 'utils/edit-induction',
             icon: icons.IconLayoutGridAdd,
             breadcrumbs: false
         }

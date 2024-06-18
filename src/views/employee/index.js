@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Autocomplete, Grid, TextField, List, ListItem, ListItemText, Typography } from '@mui/material';
+import { Autocomplete, Grid, TextField, List, ListItem, ListItemText, Typography, IconButton, ListItemSecondaryAction } from '@mui/material';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -77,7 +78,7 @@ const EmployeeAll = () => {
         if (completionDate && yearsExpire) {
             const expiryDate = new Date(completionDate);
             expiryDate.setFullYear(expiryDate.getFullYear() + yearsExpire);
-            return expiryDate.toLocaleDateString();
+            return formatDate(expiryDate); // Use the formatDate function for consistent formatting
         }
         return 'N/A';
     };
@@ -97,6 +98,16 @@ const EmployeeAll = () => {
         }
 
         return 'rgba(0, 255, 0, 0.2)'; // Green for completed and not expiring soon
+    };
+
+    const handleCertificateClick = (employeeCourse) => {
+        const certificate = employeeCertificates.find(
+            certificate => certificate.attributes.course.data.id === employeeCourse.attributes.course.data.id
+        );
+
+        if (certificate) {
+            window.open(certificate.attributes.certificate.data.attributes.url, '_blank');
+        }
     };
 
     return (
@@ -123,31 +134,17 @@ const EmployeeAll = () => {
                 {selectedEmployee && (
                     <Grid item xs={12}>
                         <SubCard title={`Employee Details for ${selectedEmployee.fullname}`}>
-                        <Typography><b>Archived:</b> Current Employee</Typography>
-
-                        <Typography><b>Fullname:</b> {selectedEmployee.fullname}</Typography>
-                        <Typography><b>Job Title:</b> {selectedEmployee.jobtitle}</Typography>
-<Typography><b>Address:</b> {selectedEmployee.address}</Typography>
-<Typography><b>Email:</b> {selectedEmployee.email}</Typography>
-<Typography><b>Home Tel:</b> {selectedEmployee.hometel}</Typography>
-<Typography><b>Mobile Tel:</b> {selectedEmployee.mobiletel}</Typography>
-<Typography><b>Date of Birth:</b> {formatDate(selectedEmployee.dob)}</Typography>
-<Typography><b>National Insurance Number:</b> {selectedEmployee.ni}</Typography>
-<Typography><b>Start Date:</b> {formatDate(selectedEmployee.startdate)}</Typography>
-<Typography><b>Any Certificates?</b> {employeeCertificates.length > 0 ? 'Yes' : 'No'}</Typography>
-
-                            {employeeCertificates.length > 0 && (
-                                <Typography>
-                                    Certificate(s):{' '}
-                                    <a
-                                        href={employeeCertificates[0].attributes.certificate.data.attributes.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
-                                        {employeeCertificates[0].attributes.certificate.data.attributes.name}
-                                    </a>
-                                </Typography>
-                            )}
+                            <Typography><b>Archived:</b> Current Employee</Typography>
+                            <Typography><b>Fullname:</b> {selectedEmployee.fullname}</Typography>
+                            <Typography><b>Job Title:</b> {selectedEmployee.jobtitle}</Typography>
+                            <Typography><b>Address:</b> {selectedEmployee.address}</Typography>
+                            <Typography><b>Email:</b> {selectedEmployee.email}</Typography>
+                            <Typography><b>Home Tel:</b> {selectedEmployee.hometel}</Typography>
+                            <Typography><b>Mobile Tel:</b> {selectedEmployee.mobiletel}</Typography>
+                            <Typography><b>Date of Birth:</b> {formatDate(selectedEmployee.dob)}</Typography>
+                            <Typography><b>National Insurance Number:</b> {selectedEmployee.ni}</Typography>
+                            <Typography><b>Start Date:</b> {formatDate(selectedEmployee.startdate)}</Typography>
+                            <Typography><b>Any Certificates?</b> {employeeCertificates.length > 0 ? 'Yes' : 'No'}</Typography>
                         </SubCard>
                     </Grid>
                 )}
@@ -185,6 +182,19 @@ const EmployeeAll = () => {
                                                         </>
                                                     }
                                                 />
+                                                <ListItemSecondaryAction>
+                                                    {employeeCertificates.find(
+                                                        certificate => certificate.attributes.course.data.id === employeeCourse.attributes.course.data.id
+                                                    ) && (
+                                                        <IconButton
+                                                            edge="end"
+                                                            aria-label="certificate"
+                                                            onClick={() => handleCertificateClick(employeeCourse)}
+                                                        >
+                                                            <InsertDriveFileIcon />
+                                                        </IconButton>
+                                                    )}
+                                                </ListItemSecondaryAction>
                                             </ListItem>
                                         );
                                     })}

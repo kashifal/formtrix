@@ -21,7 +21,7 @@ const Dashboard = () => {
                     Fox Training Matrix
                 </Typography>
                 <Typography variant="h4" align="center" gutterBottom style={{ color: '#b80a2d' }}> 
-                New version being uploaded, bear with us!
+                
                 </Typography>
             </Grid>
             <Grid item lg={6} md={6} sm={12} xs={12}>

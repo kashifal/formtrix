@@ -44,7 +44,7 @@ const upload = {
             title: <FormattedMessage id="Bulk Upload" />,
             type: 'item',
             icon: icons.IconUserCheck,
-            url: '/apps/mail'
+            url: '/apps/bulkupload'
         },
 /*         {
             id: 'staff',
@@ -62,10 +62,10 @@ const upload = {
             breadcrumbs: false
         },
         {
-            id: 'util-grid',
-            title: <FormattedMessage id="Manage Induction" />,
+            id: 'edit-induction',
+            title: <FormattedMessage id="Edit Induction" />,
             type: 'item',
-            url: '/utils/util-grid',
+            url: 'utils/edit-induction',
             icon: icons.IconLayoutKanban,
             breadcrumbs: false
         }
