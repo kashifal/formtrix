@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-# Matrix2
-
-# For Fox Group
 
 # Introduction
 
