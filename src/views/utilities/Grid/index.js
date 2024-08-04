@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Autocomplete, Grid, TextField, Button, Box, Select, MenuItem, Link, Card, CardContent, Typography
-} from '@mui/material';
+import { Autocomplete, Grid, TextField, Button, Box, Select, MenuItem, Link, Card, CardContent, Typography } from '@mui/material';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -24,48 +22,56 @@ const InductionModule = () => {
 
     useEffect(() => {
         fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/texts/')
-            .then(response => response.json())
-            .then(data => {
-                setPages(data.data.map(page => ({
-                    label: page.attributes.Title,
-                    id: page.id,
-                    title: page.attributes.Title,
-                    text: page.attributes.text,
-                    textCheckBox: page.attributes.TextCheckBox,
-                    quizElement: page.attributes.QuizElement || '',
-                    checkboxElement: page.attributes.CheckboxElement,
-                    pdfElement: page.attributes.PdfElement || '',
-                    link: getLink(page.attributes.Title)
-                })));
+            .then((response) => response.json())
+            .then((data) => {
+                setPages(
+                    data.data.map((page) => ({
+                        label: page.attributes.Title,
+                        id: page.id,
+                        title: page.attributes.Title,
+                        text: page.attributes.text,
+                        textCheckBox: page.attributes.TextCheckBox,
+                        quizElement: page.attributes.QuizElement || '',
+                        checkboxElement: page.attributes.CheckboxElement,
+                        pdfElement: page.attributes.PdfElement || '',
+                        link: getLink(page.attributes.Title)
+                    }))
+                );
             });
 
         fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/quizzes/')
-            .then(response => response.json())
-            .then(data => {
-                setQuizzes(data.data.map(quiz => ({
-                    id: quiz.id,
-                    question: quiz.attributes.Question
-                })));
+            .then((response) => response.json())
+            .then((data) => {
+                setQuizzes(
+                    data.data.map((quiz) => ({
+                        id: quiz.id,
+                        question: quiz.attributes.Question
+                    }))
+                );
             });
 
         fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/pdfs/')
-            .then(response => response.json())
-            .then(data => {
-                setPdfs(data.data.map(pdf => ({
-                    id: pdf.id,
-                    pdfname: pdf.attributes.pdfname
-                })));
+            .then((response) => response.json())
+            .then((data) => {
+                setPdfs(
+                    data.data.map((pdf) => ({
+                        id: pdf.id,
+                        pdfname: pdf.attributes.pdfname
+                    }))
+                );
             });
 
         fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/video-pages/')
-            .then(response => response.json())
-            .then(data => {
-                setVideos(data.data.map(video => ({
-                    id: video.id,
-                    name: video.attributes.VideoName,
-                    url: video.attributes.URL,
-                    description: video.attributes.Description
-                })));
+            .then((response) => response.json())
+            .then((data) => {
+                setVideos(
+                    data.data.map((video) => ({
+                        id: video.id,
+                        name: video.attributes.VideoName,
+                        url: video.attributes.URL,
+                        description: video.attributes.Description
+                    }))
+                );
             });
     }, []);
 
@@ -96,7 +102,7 @@ const InductionModule = () => {
             setCheckboxElement(newValue.checkboxElement);
             setPdfElement(newValue.pdfElement || '');
             if (['About the Fox Group', 'Equality and Diversity', 'The Environment'].includes(newValue.title)) {
-                const video = videos.find(v => v.name === newValue.title);
+                const video = videos.find((v) => v.name === newValue.title);
                 setVideoElement(video ? video.url : '');
             } else {
                 setVideoElement('');
@@ -138,7 +144,9 @@ const InductionModule = () => {
 
             const responseData = await response.json();
             console.log('Success:', responseData);
-            const updatedPages = pages.map(p => p.id === selectedPage.id ? { ...p, title, text, textCheckBox, quizElement, checkboxElement, pdfElement, videoElement } : p);
+            const updatedPages = pages.map((p) =>
+                p.id === selectedPage.id ? { ...p, title, text, textCheckBox, quizElement, checkboxElement, pdfElement, videoElement } : p
+            );
             setPages(updatedPages);
         } catch (error) {
             console.error('Error:', error);
@@ -163,12 +171,7 @@ const InductionModule = () => {
                 {selectedPage && (
                     <Grid item xs={12}>
                         <SubCard title="Page Content">
-                            <TextField
-                                label="Title"
-                                fullWidth
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                            />
+                            <TextField label="Title" fullWidth value={title} onChange={(e) => setTitle(e.target.value)} />
                             <TextField
                                 label="Text"
                                 fullWidth
@@ -185,7 +188,7 @@ const InductionModule = () => {
                                 onChange={(e) => setTextCheckBox(e.target.value)}
                                 sx={{ mt: 2 }}
                             />
-                            
+
                             {selectedPage.title === 'Equality and Diversity' && (
                                 <Select
                                     label="Quiz Element"
@@ -195,12 +198,14 @@ const InductionModule = () => {
                                     sx={{ mt: 2 }}
                                 >
                                     <MenuItem value="">No Quiz</MenuItem>
-                                    {quizzes.map(quiz => (
-                                        <MenuItem key={quiz.id} value={quiz.question}>{quiz.question}</MenuItem>
+                                    {quizzes.map((quiz) => (
+                                        <MenuItem key={quiz.id} value={quiz.question}>
+                                            {quiz.question}
+                                        </MenuItem>
                                     ))}
                                 </Select>
                             )}
-                            
+
                             {selectedPage.title === 'Fox Group Policies' && (
                                 <Select
                                     label="PDF Element"
@@ -210,13 +215,17 @@ const InductionModule = () => {
                                     sx={{ mt: 2 }}
                                 >
                                     <MenuItem value="">No PDF</MenuItem>
-                                    {pdfs.map(pdf => (
-                                        <MenuItem key={pdf.id} value={pdf.pdfname}>{pdf.pdfname}</MenuItem>
+                                    {pdfs.map((pdf) => (
+                                        <MenuItem key={pdf.id} value={pdf.pdfname}>
+                                            {pdf.pdfname}
+                                        </MenuItem>
                                     ))}
                                 </Select>
                             )}
-                            
-                            {(selectedPage.title === 'About the Fox Group' || selectedPage.title === 'Equality and Diversity' || selectedPage.title === 'The Environment') && (
+
+                            {(selectedPage.title === 'About the Fox Group' ||
+                                selectedPage.title === 'Equality and Diversity' ||
+                                selectedPage.title === 'The Environment') && (
                                 <>
                                     <TextField
                                         label="Video URL"
@@ -227,10 +236,12 @@ const InductionModule = () => {
                                     />
                                     <Card sx={{ mt: 2 }}>
                                         <CardContent>
-                                            <Typography variant="h6" component="div">Video Preview</Typography>
+                                            <Typography variant="h6" component="div">
+                                                Video Preview
+                                            </Typography>
                                             {videoElement && (
                                                 <iframe
-                                                title={`video-preview-${selectedPage.url}-${selectedPage.title}`}
+                                                    title={`video-preview-${selectedPage.url}-${selectedPage.title}`}
                                                     width="100%"
                                                     height="315"
                                                     src={videoElement.replace('watch?v=', 'embed/')}
@@ -254,8 +265,25 @@ const InductionModule = () => {
 
                 <Grid item xs={12}>
                     <Box display="flex" justifyContent="space-between" mt={2}>
-                        <Button variant="contained" color="primary" onClick={handleSubmit} disabled={!selectedPage}>Save Changes</Button>
-                        <Button variant="contained" color="secondary" onClick={() => { setSelectedPage(null); setTitle(''); setText(''); setTextCheckBox(''); setQuizElement(''); setCheckboxElement(''); setPdfElement(''); setVideoElement(''); }}>Clear</Button>
+                        <Button variant="contained" color="primary" onClick={handleSubmit} disabled={!selectedPage}>
+                            Save Changes
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            onClick={() => {
+                                setSelectedPage(null);
+                                setTitle('');
+                                setText('');
+                                setTextCheckBox('');
+                                setQuizElement('');
+                                setCheckboxElement('');
+                                setPdfElement('');
+                                setVideoElement('');
+                            }}
+                        >
+                            Clear
+                        </Button>
                     </Box>
                 </Grid>
             </Grid>

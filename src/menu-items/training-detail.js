@@ -24,16 +24,13 @@ const trainingdetail = {
     icon: icons.IconApps,
     type: 'group',
     children: [
-        
         {
             id: 'companies',
             title: <FormattedMessage id="Companies" />,
             type: 'item',
             icon: icons.IconUserCheck,
             url: '/apps/chat'
-        },
-       
-      
+        }
     ]
 };
 

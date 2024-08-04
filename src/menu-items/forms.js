@@ -2,15 +2,7 @@
 import { FormattedMessage } from 'react-intl';
 
 // assets
-import {
-    IconClipboardCheck,
-    IconPictureInPicture,
-    IconForms,
-    IconBorderAll,
-    IconChartDots,
-    IconStairsUp,
-
-} from '@tabler/icons-react';
+import { IconClipboardCheck, IconPictureInPicture, IconForms, IconBorderAll, IconChartDots, IconStairsUp } from '@tabler/icons-react';
 
 // constant
 const icons = {
@@ -20,7 +12,6 @@ const icons = {
     IconBorderAll,
     IconChartDots,
     IconStairsUp
-
 };
 
 // ==============================|| UI FORMS MENU ITEMS ||============================== //
@@ -61,8 +52,6 @@ const forms = {
                 }
             ]
         },
-     
-        
 
         {
             id: 'forms-validation',

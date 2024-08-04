@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Autocomplete, Grid, TextField, List, ListItem, ListItemText, Typography } from '@mui/material';
 
 // project imports
@@ -13,57 +13,57 @@ const EmployeeAll = () => {
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [employeeCourses, setEmployeeCourses] = useState([]);
 
+    const fetchCompanies = useCallback(() => {
+        fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/companies?populate[skill]=*&fields=name')
+            .then((response) => response.json())
+            .then((data) => {
+                const formattedCompanies = data.data.map((company) => ({
+                    label: company.attributes.name,
+                    id: company.id
+                }));
+                setCompanies(formattedCompanies);
+            });
+    }, []);
+
+    const fetchEmployees = useCallback(() => {
+        const apiUrl = `https://glowing-paradise-cfe00f2697.strapiapp.com/api/employees?filters[company][id][$eq]=${selectedCompany.id}`;
+
+        fetch(apiUrl)
+            .then((response) => response.json())
+            .then((data) => {
+                const formattedEmployees = data.data.map((employee) => ({
+                    label: employee.attributes.fullname,
+                    id: employee.id
+                }));
+                setEmployees(formattedEmployees);
+            });
+    }, [selectedCompany]);
+
+    const fetchEmployeeCourses = useCallback(() => {
+        const apiUrl = `https://glowing-paradise-cfe00f2697.strapiapp.com/api/employee-courses?filters[employee][id][$eq]=${selectedEmployee.id}&populate[course]=name,shortname,datecompleted,YearsExpire`;
+
+        fetch(apiUrl)
+            .then((response) => response.json())
+            .then((data) => {
+                setEmployeeCourses(data.data);
+            });
+    }, [selectedEmployee]);
+
     useEffect(() => {
         fetchCompanies();
-    }, []);
+    }, [fetchCompanies]);
 
     useEffect(() => {
         if (selectedCompany) {
             fetchEmployees();
         }
-    }, [selectedCompany]);
+    }, [selectedCompany, fetchEmployees]);
 
     useEffect(() => {
         if (selectedEmployee) {
             fetchEmployeeCourses();
         }
-    }, [selectedEmployee]);
-
-    const fetchCompanies = () => {
-        fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/companies?populate[skill]=*&fields=name')
-            .then(response => response.json())
-            .then(data => {
-                const formattedCompanies = data.data.map(company => ({
-                    label: company.attributes.name,
-                    id: company.id,
-                }));
-                setCompanies(formattedCompanies);
-            });
-    };
-
-    const fetchEmployees = () => {
-        const apiUrl = `https://glowing-paradise-cfe00f2697.strapiapp.com/api/employees?filters[company][id][$eq]=${selectedCompany.id}`;
-    
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                const formattedEmployees = data.data.map(employee => ({
-                    label: employee.attributes.fullname,
-                    id: employee.id,
-                }));
-                setEmployees(formattedEmployees);
-            });
-    };
-
-    const fetchEmployeeCourses = () => {
-        const apiUrl = `https://glowing-paradise-cfe00f2697.strapiapp.com/api/employee-courses?filters[employee][id][$eq]=${selectedEmployee.id}&populate[course]=name,shortname,datecompleted,YearsExpire`;
-
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                setEmployeeCourses(data.data);
-            });
-    };
+    }, [selectedEmployee, fetchEmployeeCourses]);
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -72,7 +72,6 @@ const EmployeeAll = () => {
         const year = date.getFullYear();
         return `${day}.${month}.${year}`;
     };
-
 
     const calculateExpiryDate = (completionDate, yearsExpire) => {
         if (completionDate && yearsExpire) {
@@ -144,45 +143,44 @@ const EmployeeAll = () => {
 
                 {selectedEmployee && (
                     <Grid item xs={12}>
-                    <SubCard title="Completed Courses">
-                        {employeeCourses.length > 0 ? (
-                            <List>
-                                {employeeCourses.map(employeeCourse => {
-                                    const completionDate = employeeCourse.attributes.DateCompleted;
-                                    const formattedCompletionDate = completionDate ? formatDate(completionDate) : null;
-                                    const expiryDate = calculateExpiryDate(
-                                        completionDate,
-                                        employeeCourse.attributes.course.data.attributes.YearsExpire
-                                    );
-                                    const highlightColor = getHighlightColor(completionDate, expiryDate);
+                        <SubCard title="Completed Courses">
+                            {employeeCourses.length > 0 ? (
+                                <List>
+                                    {employeeCourses.map((employeeCourse) => {
+                                        const completionDate = employeeCourse.attributes.DateCompleted;
+                                        const formattedCompletionDate = completionDate ? formatDate(completionDate) : null;
+                                        const expiryDate = calculateExpiryDate(
+                                            completionDate,
+                                            employeeCourse.attributes.course.data.attributes.YearsExpire
+                                        );
+                                        const highlightColor = getHighlightColor(completionDate, expiryDate);
 
-                                    return (
-                                        <ListItem
-                                            key={employeeCourse.id}
-                                            style={{ backgroundColor: highlightColor }}
-                                        >
-                                            <ListItemText
-                                                primary={employeeCourse.attributes.course.data.attributes.name}
-                                                secondary={
-                                                    <>
-                                                        <Typography component="span" variant="body2">
-                                                            {formattedCompletionDate ? `Completed on ${formattedCompletionDate}` : 'Not yet completed'}
-                                                        </Typography>
-                                                        <br />
-                                                        <Typography component="span" variant="body2">
-                                                            Expires on {expiryDate}
-                                                        </Typography>
-                                                    </>
-                                                }
-                                            />
-                                        </ListItem>
-                                    );
-                                })}
-                            </List>
-                        ) : (
-                            <Typography>No courses completed yet.</Typography>
-                        )}
-                    </SubCard>
+                                        return (
+                                            <ListItem key={employeeCourse.id} style={{ backgroundColor: highlightColor }}>
+                                                <ListItemText
+                                                    primary={employeeCourse.attributes.course.data.attributes.name}
+                                                    secondary={
+                                                        <>
+                                                            <Typography component="span" variant="body2">
+                                                                {formattedCompletionDate
+                                                                    ? `Completed on ${formattedCompletionDate}`
+                                                                    : 'Not yet completed'}
+                                                            </Typography>
+                                                            <br />
+                                                            <Typography component="span" variant="body2">
+                                                                Expires on {expiryDate}
+                                                            </Typography>
+                                                        </>
+                                                    }
+                                                />
+                                            </ListItem>
+                                        );
+                                    })}
+                                </List>
+                            ) : (
+                                <Typography>No courses completed yet.</Typography>
+                            )}
+                        </SubCard>
                     </Grid>
                 )}
             </Grid>

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Card, CardContent, Avatar } from '@mui/material';
 
 const LogoCard = ({ isLoading, logoUrl }) => {
-    
     return (
         <Card sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
             <CardContent sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>

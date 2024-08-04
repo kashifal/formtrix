@@ -1,5 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Autocomplete, Grid, TextField, Typography, Button, Box, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar } from '@mui/material';
+import {
+    Autocomplete,
+    Grid,
+    TextField,
+    Typography,
+    Button,
+    Box,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Snackbar
+} from '@mui/material';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -20,22 +32,75 @@ const CourseComplete = () => {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [warningDialogOpen, setWarningDialogOpen] = useState(false);
 
+    const fetchCompanies = useCallback(() => {
+        fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/companies?populate[skill]=*&fields=name')
+            .then((response) => response.json())
+            .then((data) => {
+                const formattedCompanies = data.data.map((company) => ({
+                    label: company.attributes.name,
+                    id: company.id
+                }));
+                setCompanies(formattedCompanies);
+            });
+    }, []);
+
+    const fetchCourses = useCallback(() => {
+        fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/courses/')
+            .then((response) => response.json())
+            .then((data) => {
+                const formattedCourses = data.data.map((course) => ({
+                    label: course.attributes.name,
+                    id: course.id
+                }));
+                setCourses(formattedCourses);
+            });
+    }, []);
+
+    const fetchEmployees = useCallback(() => {
+        const apiUrl = `https://glowing-paradise-cfe00f2697.strapiapp.com/api/employees?filters[company][id][$eq]=${selectedCompany.id}`;
+
+        fetch(apiUrl)
+            .then((response) => response.json())
+            .then((data) => {
+                const formattedEmployees = data.data.map((employee) => ({
+                    label: employee.attributes.fullname,
+                    id: employee.id
+                }));
+                setEmployees(formattedEmployees);
+            });
+    }, [selectedCompany]);
+
+    const fetchCompletedCourses = useCallback((employeeId) => {
+        const apiUrl = `https://glowing-paradise-cfe00f2697.strapiapp.com/api/employee-courses?filters[employee][id][$eq]=${employeeId}&populate=course`;
+
+        fetch(apiUrl)
+            .then((response) => response.json())
+            .then((data) => {
+                const formattedCompletedCourses = data.data.map((ec) => ({
+                    id: ec.attributes.course.data.id,
+                    label: ec.attributes.course.data.attributes.name,
+                    dateCompleted: ec.attributes.DateCompleted
+                }));
+                setCompletedCourses(formattedCompletedCourses);
+            });
+    }, []);
+
     useEffect(() => {
         fetchCompanies();
-    }, []);
+    }, [fetchCompanies]);
 
     useEffect(() => {
         if (selectedCompany) {
             fetchEmployees();
             fetchCourses(); // Assuming courses are not dependent on the company. If they are, move this call inside fetchEmployees.
         }
-    }, [selectedCompany]);
+    }, [selectedCompany, fetchEmployees, fetchCourses]);
 
     useEffect(() => {
         if (selectedEmployee) {
             fetchCompletedCourses(selectedEmployee.id);
         }
-    }, [selectedEmployee]);
+    }, [selectedEmployee, fetchCompletedCourses]);
 
     useEffect(() => {
         const initialDates = {};
@@ -48,91 +113,40 @@ const CourseComplete = () => {
         });
         setCourseCompletionDates(initialDates);
         setIsCompletionDateAdded(completionDateAdded);
-    }, [selectedCourses]);
+    }, [selectedCourses, courseCompletionDates]);
 
-    const fetchCompanies = () => {
-        fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/companies?populate[skill]=*&fields=name')
-            .then(response => response.json())
-            .then(data => {
-                const formattedCompanies = data.data.map(company => ({
-                    label: company.attributes.name,
-                    id: company.id,
-                }));
-                setCompanies(formattedCompanies);
-            });
-    };
-
-    const fetchCourses = () => {
-        fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/courses/')
-            .then(response => response.json())
-            .then(data => {
-                const formattedCourses = data.data.map(course => ({
-                    label: course.attributes.name,
-                    id: course.id,
-                }));
-                setCourses(formattedCourses);
-            });
-    };
-
-    const fetchEmployees = () => {
-        const apiUrl = `https://glowing-paradise-cfe00f2697.strapiapp.com/api/employees?filters[company][id][$eq]=${selectedCompany.id}`;
-    
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                const formattedEmployees = data.data.map(employee => ({
-                    label: employee.attributes.fullname,
-                    id: employee.id,
-                }));
-                setEmployees(formattedEmployees);
-            });
-    };
-
-    const fetchCompletedCourses = (employeeId) => {
-        const apiUrl = `https://glowing-paradise-cfe00f2697.strapiapp.com/api/employee-courses?filters[employee][id][$eq]=${employeeId}&populate=course`;
-    
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                const formattedCompletedCourses = data.data.map(ec => ({
-                    id: ec.attributes.course.data.id,
-                    label: ec.attributes.course.data.attributes.name,
-                    dateCompleted: ec.attributes.DateCompleted
-                }));
-                setCompletedCourses(formattedCompletedCourses);
-            });
-    };
-    
     const handleDateChange = (courseId, date) => {
         setCourseCompletionDates((prevDates) => {
             const updatedDates = { ...prevDates, [courseId]: date };
-            const completionDateAdded = Object.values(updatedDates).some(date => date !== '');
+            const completionDateAdded = Object.values(updatedDates).some((date) => date !== '');
             setIsCompletionDateAdded(completionDateAdded);
             return updatedDates;
         });
     };
 
     const handleSubmit = async () => {
-        const employeeCoursesUpdates = selectedCourses.map(course => ({
+        const employeeCoursesUpdates = selectedCourses.map((course) => ({
             data: {
                 course: course.id,
                 employee: selectedEmployee.id,
-                DateCompleted: courseCompletionDates[course.id],
+                DateCompleted: courseCompletionDates[course.id]
             }
         }));
-    
+
         try {
-            const responses = await Promise.all(employeeCoursesUpdates.map(update =>
-                fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/employee-courses', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(update),
-                })
-            ));
-    
-            const data = await Promise.all(responses.map(response => response.json()));
+            const responses = await Promise.all(
+                employeeCoursesUpdates.map((update) =>
+                    fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/employee-courses', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(update)
+                    })
+                )
+            );
+
+            const data = await Promise.all(responses.map((response) => response.json()));
             console.log('Success:', data);
             setOpenSnackbar(true); // Show success feedback
             setSelectedCourses([]); // Clear selected courses
@@ -168,8 +182,8 @@ const CourseComplete = () => {
     };
 
     const handleOpenDialog = () => {
-        const overlappingCourses = selectedCourses.filter(course => 
-            completedCourses.some(completedCourse => completedCourse.id === course.id)
+        const overlappingCourses = selectedCourses.filter((course) =>
+            completedCourses.some((completedCourse) => completedCourse.id === course.id)
         );
 
         if (overlappingCourses.length > 0) {
@@ -268,11 +282,17 @@ const CourseComplete = () => {
                     <Box display="flex" justifyContent="space-between" mt={2}>
                         {isCompletionDateAdded && (
                             <>
-                                <Button variant="contained" color="primary" onClick={handleOpenDialog}>Submit</Button>
-                                <Button variant="contained" color="primary" onClick={handleOpenDialog}>Submit and Add Another Employee</Button>
+                                <Button variant="contained" color="primary" onClick={handleOpenDialog}>
+                                    Submit
+                                </Button>
+                                <Button variant="contained" color="primary" onClick={handleOpenDialog}>
+                                    Submit and Add Another Employee
+                                </Button>
                             </>
                         )}
-                        <Button variant="contained" color="secondary" onClick={handleClear}>Clear</Button>
+                        <Button variant="contained" color="secondary" onClick={handleClear}>
+                            Clear
+                        </Button>
                         <Button variant="contained">Home</Button>
                     </Box>
                 </Grid>
@@ -291,8 +311,12 @@ const CourseComplete = () => {
                     </ul>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleDialogClose} color="secondary">Cancel</Button>
-                    <Button onClick={handleDialogSubmit} color="primary">Confirm</Button>
+                    <Button onClick={handleDialogClose} color="secondary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleDialogSubmit} color="primary">
+                        Confirm
+                    </Button>
                 </DialogActions>
             </Dialog>
 
@@ -301,28 +325,25 @@ const CourseComplete = () => {
                 <DialogContent>
                     <Typography>The following course/s have already been completed by {selectedEmployee?.label}:</Typography>
                     <ul>
-                        {selectedCourses.filter(course => 
-                            completedCourses.some(completedCourse => completedCourse.id === course.id)
-                        ).map((course) => (
-                            <li key={course.id}>
-                                {course.label}
-                            </li>
-                        ))}
+                        {selectedCourses
+                            .filter((course) => completedCourses.some((completedCourse) => completedCourse.id === course.id))
+                            .map((course) => (
+                                <li key={course.id}>{course.label}</li>
+                            ))}
                     </ul>
                     <Typography>Are you sure you want to make this change?</Typography>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleWarningDialogClose} color="secondary">Cancel</Button>
-                    <Button onClick={handleWarningDialogSubmit} color="primary">Confirm</Button>
+                    <Button onClick={handleWarningDialogClose} color="secondary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleWarningDialogSubmit} color="primary">
+                        Confirm
+                    </Button>
                 </DialogActions>
             </Dialog>
 
-            <Snackbar
-                open={openSnackbar}
-                autoHideDuration={6000}
-                onClose={handleSnackbarClose}
-                message="Courses successfully submitted"
-            />
+            <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleSnackbarClose} message="Courses successfully submitted" />
         </MainCard>
     );
 };

@@ -30,7 +30,7 @@ const HeatMap = () => {
         },
         title: {
             text: 'Company Course Completion Heatmap'
-        },
+        }
         // Additional styling and configuration here
     };
 
@@ -39,6 +39,6 @@ const HeatMap = () => {
             <ReactApexChart options={options} series={series} type="heatmap" />
         </div>
     );
-}
+};
 
 export default HeatMap;

@@ -11,7 +11,9 @@ function DashboardEmSkill() {
     useEffect(() => {
         const fetchEmployeesData = async () => {
             try {
-                const response = await axios.get(`https://yourapi.com/api/employees?filters[skill][$eq]=${skill}&filters[company][$eq]=${company}&populate=*`);
+                const response = await axios.get(
+                    `https://yourapi.com/api/employees?filters[skill][$eq]=${skill}&filters[company][$eq]=${company}&populate=*`
+                );
                 if (response.data && response.data.length > 0) {
                     setEmployees(response.data);
                 }

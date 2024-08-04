@@ -31,11 +31,11 @@ const EmployeeAll = () => {
 
     const fetchCompanies = () => {
         fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/companies?populate[skill]=*&fields=name')
-            .then(response => response.json())
-            .then(data => {
-                const formattedCompanies = data.data.map(company => ({
+            .then((response) => response.json())
+            .then((data) => {
+                const formattedCompanies = data.data.map((company) => ({
                     label: company.attributes.name,
-                    id: company.id,
+                    id: company.id
                 }));
                 setCompanies(formattedCompanies);
             });
@@ -43,13 +43,13 @@ const EmployeeAll = () => {
 
     const fetchEmployees = () => {
         const apiUrl = `https://glowing-paradise-cfe00f2697.strapiapp.com/api/employees?filters[company][id][$eq]=${selectedCompany.id}`;
-    
+
         fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                const formattedEmployees = data.data.map(employee => ({
+            .then((response) => response.json())
+            .then((data) => {
+                const formattedEmployees = data.data.map((employee) => ({
                     label: employee.attributes.fullname,
-                    id: employee.id,
+                    id: employee.id
                 }));
                 setEmployees(formattedEmployees);
             });
@@ -59,8 +59,8 @@ const EmployeeAll = () => {
         const apiUrl = `https://glowing-paradise-cfe00f2697.strapiapp.com/api/employee-courses?filters[employee][id][$eq]=${selectedEmployee.id}&populate[course]=name,shortname,datecompleted`;
 
         fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
+            .then((response) => response.json())
+            .then((data) => {
                 setEmployeeCourses(data.data);
             });
     };
@@ -112,11 +112,15 @@ const EmployeeAll = () => {
                         <SubCard title="Training Record">
                             {employeeCourses.length > 0 ? (
                                 <List>
-                                    {employeeCourses.map(employeeCourse => (
+                                    {employeeCourses.map((employeeCourse) => (
                                         <ListItem key={employeeCourse.id}>
-                                            <ListItemText 
+                                            <ListItemText
                                                 primary={employeeCourse.attributes.course.data.attributes.name}
-                                                secondary={employeeCourse.attributes.DateCompleted ? `Completed on ${employeeCourse.attributes.DateCompleted}` : 'Not yet completed'}
+                                                secondary={
+                                                    employeeCourse.attributes.DateCompleted
+                                                        ? `Completed on ${employeeCourse.attributes.DateCompleted}`
+                                                        : 'Not yet completed'
+                                                }
                                             />
                                         </ListItem>
                                     ))}

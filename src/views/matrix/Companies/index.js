@@ -4,12 +4,12 @@ import { Grid } from '@mui/material';
 // project imports
 import LogoCard from './LogoCard';
 import ToDoList from './ToDoList';
-import EmployeeProgress from './EmployeeProgress'; 
+import EmployeeProgress from './EmployeeProgress';
 import { gridSpacing } from 'store/constant';
 
 const Dashboard = () => {
     const [isLoading, setLoading] = useState(true);
-    const logoUrl = "/path_to/Tipworx.png"; // Update with the correct path
+    const logoUrl = '/path_to/Tipworx.png'; // Update with the correct path
 
     useEffect(() => {
         setLoading(false);

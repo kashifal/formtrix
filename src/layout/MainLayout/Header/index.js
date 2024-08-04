@@ -41,7 +41,7 @@ const Header = () => {
                 {layout === LAYOUT_CONST.VERTICAL_LAYOUT || (layout === LAYOUT_CONST.HORIZONTAL_LAYOUT && matchDownMd) ? (
                     <Box
                         sx={{
-                            ml: 2, // Added for alignment, adjust or remove as needed
+                            ml: 2 // Added for alignment, adjust or remove as needed
                         }}
                     >
                         <IconMenu2 stroke={1.5} size="20px" onClick={() => dispatch(openDrawer(!drawerOpen))} />

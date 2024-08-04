@@ -6,156 +6,167 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 // Helper function to make API requests
 const api = (endpoint, method = 'GET', body = null) => {
-  const headers = { 'Content-Type': 'application/json' };
-  return fetch(`https://glowing-paradise-cfe00f2697.strapiapp.com/api${endpoint}`, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : null,
-  }).then(response => response.json());
+    const headers = { 'Content-Type': 'application/json' };
+    return fetch(`https://glowing-paradise-cfe00f2697.strapiapp.com/api${endpoint}`, {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : null
+    }).then((response) => response.json());
 };
 
 const ToDoList = ({ isLoading }) => {
-  const [todos, setTodos] = useState([]);
-  const [employees, setEmployees] = useState([]);
-  const [newTodoTitle, setNewTodoTitle] = useState('');
-  const [selectedEmployeeId, setSelectedEmployeeId] = useState('');
+    const [todos, setTodos] = useState([]);
+    const [employees, setEmployees] = useState([]);
+    const [newTodoTitle, setNewTodoTitle] = useState('');
+    const [selectedEmployeeId, setSelectedEmployeeId] = useState('');
 
-  useEffect(() => {
-    // Fetch employees
-    api('/employees?fields[0]=fullname').then(data => {
-      if (data.data) {
-        setEmployees(data.data);
-      } else {
-        console.error('Unexpected API response format for employees');
-        setEmployees([]); // Set employees to an empty array as a fallback
-      }
-    });
-  }, []);
+    useEffect(() => {
+        // Fetch employees
+        api('/employees?fields[0]=fullname').then((data) => {
+            if (data.data) {
+                setEmployees(data.data);
+            } else {
+                console.error('Unexpected API response format for employees');
+                setEmployees([]); // Set employees to an empty array as a fallback
+            }
+        });
+    }, []);
 
-  useEffect(() => {
-    // Fetch todos based on the selected employee
-    const endpoint = selectedEmployeeId ? `/todos?populate[employee][fields][0]=fullname&filters[employee][id][$eq]=${selectedEmployeeId}` : '/todos?populate[employee][fields][0]=fullname';
-    api(endpoint).then(data => {
-      if (data.data) {
-        setTodos(data.data);
-      } else {
-        console.error('Unexpected API response format for todos');
-        setTodos([]); // Set todos to an empty array as a fallback
-      }
-    });
-  }, [selectedEmployeeId]);
+    useEffect(() => {
+        // Fetch todos based on the selected employee
+        const endpoint = selectedEmployeeId
+            ? `/todos?populate[employee][fields][0]=fullname&filters[employee][id][$eq]=${selectedEmployeeId}`
+            : '/todos?populate[employee][fields][0]=fullname';
+        api(endpoint).then((data) => {
+            if (data.data) {
+                setTodos(data.data);
+            } else {
+                console.error('Unexpected API response format for todos');
+                setTodos([]); // Set todos to an empty array as a fallback
+            }
+        });
+    }, [selectedEmployeeId]);
 
-  const addTodo = () => {
-    api('/todos', 'POST', {
-      data: {
-        title: newTodoTitle,
-        completed: false,
-        employee: selectedEmployeeId
-      }
-    }).then(newTodo => {
-      if (newTodo.data) {
-        setTodos([...todos, newTodo.data]);
-        setNewTodoTitle('');
-      }
-    }).catch(error => console.error('Failed to add todo:', error));
-  };
+    const addTodo = () => {
+        api('/todos', 'POST', {
+            data: {
+                title: newTodoTitle,
+                completed: false,
+                employee: selectedEmployeeId
+            }
+        })
+            .then((newTodo) => {
+                if (newTodo.data) {
+                    setTodos([...todos, newTodo.data]);
+                    setNewTodoTitle('');
+                }
+            })
+            .catch((error) => console.error('Failed to add todo:', error));
+    };
 
-  const toggleTodo = (id, completed) => {
-    api(`/todos/${id}`, 'PUT', {
-      data: {
-        completed: !completed
-      }
-    }).then(updatedTodo => {
-      if (updatedTodo.data) {
-        const newTodos = todos.map(todo => todo.id === id ? { ...todo, attributes: updatedTodo.data.attributes } : todo);
-        setTodos(newTodos);
-      }
-    }).catch(error => console.error('Failed to update todo:', error));
-  };
+    const toggleTodo = (id, completed) => {
+        api(`/todos/${id}`, 'PUT', {
+            data: {
+                completed: !completed
+            }
+        })
+            .then((updatedTodo) => {
+                if (updatedTodo.data) {
+                    const newTodos = todos.map((todo) => (todo.id === id ? { ...todo, attributes: updatedTodo.data.attributes } : todo));
+                    setTodos(newTodos);
+                }
+            })
+            .catch((error) => console.error('Failed to update todo:', error));
+    };
 
-  const deleteTodo = (id) => {
-    api(`/todos/${id}`, 'DELETE').then(() => {
-      const newTodos = todos.filter(todo => todo.id !== id);
-      setTodos(newTodos);
-    });
-  };
+    const deleteTodo = (id) => {
+        api(`/todos/${id}`, 'DELETE').then(() => {
+            const newTodos = todos.filter((todo) => todo.id !== id);
+            setTodos(newTodos);
+        });
+    };
 
-  return (
-    <MainCard title="To Do List" content={false}>
-      <CardContent>
-        {isLoading ? (
-          <p>Loading...</p>
-        ) : (
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                select
-                label="Select Employee"
-                value={selectedEmployeeId}
-                onChange={(e) => setSelectedEmployeeId(e.target.value)}
-              >
-                <MenuItem value="">All Employees</MenuItem>
-                {employees.map((employee) => (
-                  <MenuItem key={employee.id} value={employee.id}>
-                    {employee.attributes.fullname}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-            {todos.map((todo) => (
-              <Grid item xs={12} key={todo.id}>
-                <Grid container alignItems="center">
-                  <Grid item>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={todo.attributes.completed}
-                          onChange={() => toggleTodo(todo.id, todo.attributes.completed)}
-                          name={`checked-${todo.id}`}
-                          color="primary"
-                        />
-                      }
-                      label={`${todo.attributes.title} - ${todo.attributes.employee?.data?.attributes?.fullname || 'No employee assigned'}`}
-                    />
-                  </Grid>
-                  <Grid item>
-                    <IconButton onClick={() => deleteTodo(todo.id)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </Grid>
+    return (
+        <MainCard title="To Do List" content={false}>
+            <CardContent>
+                {isLoading ? (
+                    <p>Loading...</p>
+                ) : (
+                    <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                select
+                                label="Select Employee"
+                                value={selectedEmployeeId}
+                                onChange={(e) => setSelectedEmployeeId(e.target.value)}
+                            >
+                                <MenuItem value="">All Employees</MenuItem>
+                                {employees.map((employee) => (
+                                    <MenuItem key={employee.id} value={employee.id}>
+                                        {employee.attributes.fullname}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        {todos.map((todo) => (
+                            <Grid item xs={12} key={todo.id}>
+                                <Grid container alignItems="center">
+                                    <Grid item>
+                                        <FormControlLabel
+                                            control={
+                                                <Checkbox
+                                                    checked={todo.attributes.completed}
+                                                    onChange={() => toggleTodo(todo.id, todo.attributes.completed)}
+                                                    name={`checked-${todo.id}`}
+                                                    color="primary"
+                                                />
+                                            }
+                                            label={`${todo.attributes.title} - ${todo.attributes.employee?.data?.attributes?.fullname || 'No employee assigned'}`}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <IconButton onClick={() => deleteTodo(todo.id)}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        ))}
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="New To Do"
+                                value={newTodoTitle}
+                                onChange={(e) => setNewTodoTitle(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && newTodoTitle.trim() !== '') {
+                                        addTodo();
+                                        e.preventDefault();
+                                    }
+                                }}
+                            />
+                        </Grid>
+                    </Grid>
+                )}
+            </CardContent>
+            <Divider />
+            <CardActions>
+                <Grid container direction="row-reverse">
+                    <Grid item>
+                        <Fab
+                            size="small"
+                            color="primary"
+                            aria-label="add"
+                            onClick={() => newTodoTitle.trim() !== '' && selectedEmployeeId && addTodo()}
+                        >
+                            <AddRoundedIcon />
+                        </Fab>
+                    </Grid>
                 </Grid>
-              </Grid>
-            ))}
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="New To Do"
-                value={newTodoTitle}
-                onChange={(e) => setNewTodoTitle(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && newTodoTitle.trim() !== '') {
-                    addTodo();
-                    e.preventDefault();
-                  }
-                }}
-              />
-            </Grid>
-          </Grid>
-        )}
-      </CardContent>
-      <Divider />
-      <CardActions>
-        <Grid container direction="row-reverse">
-          <Grid item>
-            <Fab size="small" color="primary" aria-label="add" onClick={() => newTodoTitle.trim() !== '' && selectedEmployeeId && addTodo()}>
-              <AddRoundedIcon />
-            </Fab>
-          </Grid>
-        </Grid>
-      </CardActions>
-    </MainCard>
-  );
+            </CardActions>
+        </MainCard>
+    );
 };
 
 export default ToDoList;

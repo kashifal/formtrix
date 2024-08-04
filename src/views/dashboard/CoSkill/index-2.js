@@ -11,7 +11,9 @@ function DashboardCoSkill() {
     useEffect(() => {
         const fetchCompanyData = async () => {
             try {
-                const response = await axios.get(`https://glowing-paradise-cfe00f2697.strapiapp.com/api/companies?filters[website][$eq]=${company}&populate=*`);
+                const response = await axios.get(
+                    `https://glowing-paradise-cfe00f2697.strapiapp.com/api/companies?filters[website][$eq]=${company}&populate=*`
+                );
                 if (response.data && response.data.data.length > 0) {
                     setCompanyData(response.data.data[0].attributes);
                 }
@@ -24,12 +26,12 @@ function DashboardCoSkill() {
     }, [company]);
 
     // copy this logic?
-    
+
     const getLogoUrl = (companyData) => {
         if (companyData.logo && companyData.logo.data.length > 0) {
             const logoAttributes = companyData.logo.data[0].attributes;
             const logoFormats = logoAttributes.formats;
-    
+
             // Check if formats exist and then check for each specific format
             if (logoFormats) {
                 if (logoFormats.medium) {
@@ -40,13 +42,13 @@ function DashboardCoSkill() {
                     return logoFormats.thumbnail.url;
                 }
             }
-    
+
             // Fallback to the default URL if formats do not exist or specific formats are not available
             return logoAttributes.url;
         }
         return ''; // Return empty string or a default placeholder image URL if no logo is available
     };
-    
+
     return (
         <div>
             <Grid container spacing={2}>
@@ -67,8 +69,8 @@ function DashboardCoSkill() {
                                             image={getLogoUrl(companyData)}
                                             alt={`${companyData.name} Logo`}
                                             sx={{
-                                                maxWidth: '100%', 
-                                                maxHeight: '140px', 
+                                                maxWidth: '100%',
+                                                maxHeight: '140px',
                                                 objectFit: 'contain',
                                                 margin: 'auto'
                                             }}

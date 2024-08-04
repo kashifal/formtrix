@@ -20,21 +20,15 @@ const Dashboard = () => {
                 <Typography variant="h3" align="center" gutterBottom>
                     Fox Training Matrix
                 </Typography>
-                <Typography variant="h4" align="center" gutterBottom style={{ color: '#b80a2d' }}> 
-                
-                </Typography>
+                <Typography variant="h4" align="center" gutterBottom style={{ color: '#b80a2d' }}></Typography>
             </Grid>
             <Grid item lg={6} md={6} sm={12} xs={12}>
                 <Card sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                     <CardContent sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
                         {isLoading ? (
-                            <p>Loading...</p> 
+                            <p>Loading...</p>
                         ) : (
-                            <img
-                                src="/images/Monks.jpg"
-                                alt="Company Logo"
-                                style={{ width: '100%', height: 'auto', maxHeight: '100%' }}
-                            />
+                            <img src="/images/Monks.jpg" alt="Company Logo" style={{ width: '100%', height: 'auto', maxHeight: '100%' }} />
                         )}
                     </CardContent>
                 </Card>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { Grid, List, ListItem, ListItemText, Typography, IconButton, ListItemSecondaryAction } from '@mui/material';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
@@ -14,28 +14,17 @@ const EmployeeSkill = () => {
     const [employeeCourses, setEmployeeCourses] = useState([]);
     const [employeeCertificates, setEmployeeCertificates] = useState([]);
 
-    useEffect(() => {
-        fetchEmployees();
-    }, [companyId, skillId]);
-
-    useEffect(() => {
-        if (employees && employees.length > 0) {
-            fetchEmployeeCourses();
-            fetchEmployeeCertificates();
-        }
-    }, [employees]);
-
-    const fetchEmployees = () => {
+    const fetchEmployees = useCallback(() => {
         const apiUrl = `https://glowing-paradise-cfe00f2697.strapiapp.com/api/employees?filters[company][id][$eq]=${companyId}&filters[skills][id][$eq]=${skillId}`;
 
         fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
+            .then((response) => response.json())
+            .then((data) => {
                 if (data && data.data) {
-                    const formattedEmployees = data.data.map(employee => ({
+                    const formattedEmployees = data.data.map((employee) => ({
                         label: employee.attributes.fullname,
                         id: employee.id,
-                        ...employee.attributes,
+                        ...employee.attributes
                     }));
                     setEmployees(formattedEmployees);
                 } else {
@@ -43,15 +32,15 @@ const EmployeeSkill = () => {
                 }
             })
             .catch(() => setEmployees([]));
-    };
+    }, [companyId, skillId]);
 
-    const fetchEmployeeCourses = () => {
-        const employeeIds = employees.map(emp => emp.id).join(',');
+    const fetchEmployeeCourses = useCallback(() => {
+        const employeeIds = employees.map((emp) => emp.id).join(',');
         const apiUrl = `https://glowing-paradise-cfe00f2697.strapiapp.com/api/employee-courses?filters[employee][id][$in]=${employeeIds}&populate[course]=name,shortname,datecompleted,YearsExpire`;
 
         fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
+            .then((response) => response.json())
+            .then((data) => {
                 if (data && data.data) {
                     setEmployeeCourses(data.data);
                 } else {
@@ -59,15 +48,15 @@ const EmployeeSkill = () => {
                 }
             })
             .catch(() => setEmployeeCourses([]));
-    };
+    }, [employees]);
 
-    const fetchEmployeeCertificates = () => {
-        const employeeIds = employees.map(emp => emp.id).join(',');
+    const fetchEmployeeCertificates = useCallback(() => {
+        const employeeIds = employees.map((emp) => emp.id).join(',');
         const apiUrl = `https://glowing-paradise-cfe00f2697.strapiapp.com/api/certificates?populate=*&filters[employee][id][$in]=${employeeIds}`;
 
         fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
+            .then((response) => response.json())
+            .then((data) => {
                 if (data && data.data) {
                     setEmployeeCertificates(data.data);
                 } else {
@@ -75,7 +64,18 @@ const EmployeeSkill = () => {
                 }
             })
             .catch(() => setEmployeeCertificates([]));
-    };
+    }, [employees]);
+
+    useEffect(() => {
+        fetchEmployees();
+    }, [companyId, skillId, fetchEmployees]);
+
+    useEffect(() => {
+        if (employees && employees.length > 0) {
+            fetchEmployeeCourses();
+            fetchEmployeeCertificates();
+        }
+    }, [employees, fetchEmployeeCourses, fetchEmployeeCertificates]);
 
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
@@ -114,7 +114,7 @@ const EmployeeSkill = () => {
 
     const handleCertificateClick = (employeeCourse) => {
         const certificate = employeeCertificates.find(
-            certificate => certificate.attributes.course.data.id === employeeCourse.attributes.course.data.id
+            (certificate) => certificate.attributes.course.data.id === employeeCourse.attributes.course.data.id
         );
 
         if (certificate) {
@@ -125,27 +125,49 @@ const EmployeeSkill = () => {
     return (
         <MainCard title="Courses Completed Per Employee">
             <Grid container spacing={gridSpacing}>
-                {employees.map(employee => (
+                {employees.map((employee) => (
                     <Grid item xs={12} key={employee.id}>
                         <SubCard title={`Employee Details for ${employee.fullname}`}>
-                            <Typography><b>Archived:</b> Current Employee</Typography>
-                            <Typography><b>Fullname:</b> {employee.fullname}</Typography>
-                            <Typography><b>Job Title:</b> {employee.jobtitle}</Typography>
-                            <Typography><b>Address:</b> {employee.address}</Typography>
-                            <Typography><b>Email:</b> {employee.email}</Typography>
-                            <Typography><b>Home Tel:</b> {employee.hometel}</Typography>
-                            <Typography><b>Mobile Tel:</b> {employee.mobiletel}</Typography>
-                            <Typography><b>Date of Birth:</b> {formatDate(employee.dob)}</Typography>
-                            <Typography><b>National Insurance Number:</b> {employee.ni}</Typography>
-                            <Typography><b>Start Date:</b> {formatDate(employee.startdate)}</Typography>
-                            <Typography><b>Any Certificates?</b> {employeeCertificates.length > 0 ? 'Yes' : 'No'}</Typography>
+                            <Typography>
+                                <b>Archived:</b> Current Employee
+                            </Typography>
+                            <Typography>
+                                <b>Fullname:</b> {employee.fullname}
+                            </Typography>
+                            <Typography>
+                                <b>Job Title:</b> {employee.jobtitle}
+                            </Typography>
+                            <Typography>
+                                <b>Address:</b> {employee.address}
+                            </Typography>
+                            <Typography>
+                                <b>Email:</b> {employee.email}
+                            </Typography>
+                            <Typography>
+                                <b>Home Tel:</b> {employee.hometel}
+                            </Typography>
+                            <Typography>
+                                <b>Mobile Tel:</b> {employee.mobiletel}
+                            </Typography>
+                            <Typography>
+                                <b>Date of Birth:</b> {formatDate(employee.dob)}
+                            </Typography>
+                            <Typography>
+                                <b>National Insurance Number:</b> {employee.ni}
+                            </Typography>
+                            <Typography>
+                                <b>Start Date:</b> {formatDate(employee.startdate)}
+                            </Typography>
+                            <Typography>
+                                <b>Any Certificates?</b> {employeeCertificates.length > 0 ? 'Yes' : 'No'}
+                            </Typography>
                         </SubCard>
                         <SubCard title={`Completed Courses for ${employee.fullname}`}>
                             {employeeCourses.length > 0 ? (
                                 <List>
                                     {employeeCourses
-                                        .filter(course => course.attributes.employee.data.id === employee.id)
-                                        .map(employeeCourse => {
+                                        .filter((course) => course.attributes.employee.data.id === employee.id)
+                                        .map((employeeCourse) => {
                                             const completionDate = employeeCourse.attributes.DateCompleted;
                                             const formattedCompletionDate = completionDate ? formatDate(completionDate) : null;
                                             const expiryDate = calculateExpiryDate(
@@ -155,16 +177,15 @@ const EmployeeSkill = () => {
                                             const highlightColor = getHighlightColor(completionDate, expiryDate);
 
                                             return (
-                                                <ListItem
-                                                    key={employeeCourse.id}
-                                                    style={{ backgroundColor: highlightColor }}
-                                                >
+                                                <ListItem key={employeeCourse.id} style={{ backgroundColor: highlightColor }}>
                                                     <ListItemText
                                                         primary={employeeCourse.attributes.course.data.attributes.name}
                                                         secondary={
                                                             <>
                                                                 <Typography component="span" variant="body2">
-                                                                    {formattedCompletionDate ? `Completed on ${formattedCompletionDate}` : 'Not yet completed'}
+                                                                    {formattedCompletionDate
+                                                                        ? `Completed on ${formattedCompletionDate}`
+                                                                        : 'Not yet completed'}
                                                                 </Typography>
                                                                 <br />
                                                                 <Typography component="span" variant="body2">
@@ -175,7 +196,9 @@ const EmployeeSkill = () => {
                                                     />
                                                     <ListItemSecondaryAction>
                                                         {employeeCertificates.find(
-                                                            certificate => certificate.attributes.course.data.id === employeeCourse.attributes.course.data.id
+                                                            (certificate) =>
+                                                                certificate.attributes.course.data.id ===
+                                                                employeeCourse.attributes.course.data.id
                                                         ) && (
                                                             <IconButton
                                                                 edge="end"

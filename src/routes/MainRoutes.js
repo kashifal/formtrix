@@ -4,7 +4,7 @@ import { lazy } from 'react';
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 import AuthGuard from 'utils/route-guard/AuthGuard';
-
+// copilot keeps randomly adding code here??!!!
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
@@ -18,7 +18,6 @@ const DashboardReports = Loadable(lazy(() => import('views/dashboard/Reports')))
 const DashboardSkill = Loadable(lazy(() => import('views/dashboard/Skill')));
 
 // widget routing
-
 
 // application - user social & account profile routing
 const AppUserSocialProfile = Loadable(lazy(() => import('views/application/users/social-profile')));
@@ -144,14 +143,15 @@ const SamplePage = Loadable(lazy(() => import('views/sample-page')));
 const Skills = Loadable(lazy(() => import('views/skills')));
 const SkillCompany = Loadable(lazy(() => import('views/skill-company')));
 const SkillReport = Loadable(lazy(() => import('views/skill-report')));
-const EmployeeSkill = Loadable(lazy(() => import('views/employee-skill')));                 4
-const FullReport = Loadable (lazy(() => import('views/full-report-monks')));
+const EmployeeSkill = Loadable(lazy(() => import('views/employee-skill')));
+4;
+const FullReport = Loadable(lazy(() => import('views/full-report-monks')));
 const Employee = Loadable(lazy(() => import('views/employee')));
 const Employeefilter = Loadable(lazy(() => import('views/employeefilter')));
 const Foxtable = Loadable(lazy(() => import('views/foxtable')));
 const Reports = Loadable(lazy(() => import('views/reports')));
 const Foxskills = Loadable(lazy(() => import('views/foxskills')));
-
+const Certificates = Loadable(lazy(() => import('views/certs')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -163,8 +163,6 @@ const MainRoutes = {
         </AuthGuard>
     ),
     children: [
-
-
         {
             path: '/apps/user/social-profile/:tab',
             element: <AppUserSocialProfile />
@@ -525,7 +523,7 @@ const MainRoutes = {
         },
         {
             path: '/utils/edit-induction',
-            element: <UtilsEdit /> 
+            element: <UtilsEdit />
         },
         {
             path: '/sample-page',
@@ -544,16 +542,16 @@ const MainRoutes = {
             element: <FullReport />
         },
         {
-            path: '/skill-report/:companyId/:skillId/:courseId',   
-            element: <SkillReport />    
+            path: '/skill-report/:companyId/:skillId/:courseId',
+            element: <SkillReport />
         },
         {
-            path: '/skill-report/:companyId/:skillId',  
-            element: <SkillReport />    
+            path: '/skill-report/:companyId/:skillId',
+            element: <SkillReport />
         },
         {
-            path: '/skill-report/:companyId',   
-            element: <SkillReport />    
+            path: '/skill-report/:companyId',
+            element: <SkillReport />
         },
         {
             path: '/skill-report',
@@ -569,7 +567,7 @@ const MainRoutes = {
         },
         {
             path: '/employee-skill',
-            element: <EmployeeSkill />,
+            element: <EmployeeSkill />
         },
         {
             path: '/employee/:Id/:companyId',
@@ -577,7 +575,7 @@ const MainRoutes = {
         },
         {
             path: '/employee/:Id',
-            element: <Employee />   
+            element: <Employee />
         },
         {
             path: '/employee',
@@ -585,7 +583,7 @@ const MainRoutes = {
         },
         {
             path: '/employeefilter',
-            element: <Employeefilter />     
+            element: <Employeefilter />
         },
         {
             path: '/foxtable',
@@ -602,12 +600,16 @@ const MainRoutes = {
 
         {
             path: '/foxskills/:companyId',
-            element: <Foxskills />  
+            element: <Foxskills />
         },
 
         {
             path: '/foxskills',
             element: <Foxskills />
+        },
+        {
+            path: '/certificates',
+            element: <Certificates />
         },
 
         {
@@ -637,43 +639,42 @@ const MainRoutes = {
         {
             path: '/dashboard/coskill/:company/:skill',
             element: <DashboardCoSkill />
-          },
-          {
+        },
+        {
             path: '/dashboard/coskill/:company',
             element: <DashboardCompany />
-          },
-          {
+        },
+        {
             path: '/dashboard/training/:companyId',
-            element: <DashboardTraining />  
-          },
-          {
+            element: <DashboardTraining />
+        },
+        {
             path: '/dashboard/training',
-            element: <DashboardTraining />  
-          },
+            element: <DashboardTraining />
+        },
 
-          {
+        {
             path: '/dashboard/employee/:id/:courseId/:companyId',
             element: <DashboardEmployee />
-          },
+        },
 
-          {
+        {
             path: '/dashboard/employee/:id/:courseId',
             element: <DashboardEmployee />
-          },
+        },
 
-          {
+        {
             path: '/dashboard/employee/:id',
             element: <DashboardEmployee />
-          },
-          {
+        },
+        {
             path: '/dashboard/employee',
             element: <DashboardEmployee />
         },
         {
-          path: '/dashboard/skill/:skillId/:companyId',
-          element: <DashboardSkill /> 
+            path: '/dashboard/skill/:skillId/:companyId',
+            element: <DashboardSkill />
         }
-
     ]
 };
 

@@ -15,27 +15,29 @@ const Certificates = () => {
 
     useEffect(() => {
         if (selectedEmployee) {
-            fetchEmployeeCourses();
+            fetchEmployeeCourses(selectedEmployee.id);
         }
     }, [selectedEmployee]);
 
     const fetchEmployees = () => {
         fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/employees')
-            .then(response => response.json())
-            .then(data => {
-                const formattedEmployees = data.data.map(employee => ({
+            .then((response) => response.json())
+            .then((data) => {
+                const formattedEmployees = data.data.map((employee) => ({
                     label: employee.attributes.fullname,
                     id: employee.id,
-                    ...employee.attributes,
+                    ...employee.attributes
                 }));
                 setEmployees(formattedEmployees);
             });
     };
 
-    const fetchEmployeeCourses = () => {
-        fetch(`https://glowing-paradise-cfe00f2697.strapiapp.com/api/employee-courses?filters[employee][id][$eq]=${selectedEmployee.id}&populate[course]=name`)
-            .then(response => response.json())
-            .then(data => {
+    const fetchEmployeeCourses = (employeeId) => {
+        fetch(
+            `https://glowing-paradise-cfe00f2697.strapiapp.com/api/employee-courses?filters[employee][id][$eq]=${employeeId}&populate[course]=name`
+        )
+            .then((response) => response.json())
+            .then((data) => {
                 setEmployeeCourses(data.data);
             });
     };
@@ -49,17 +51,20 @@ const Certificates = () => {
         if (selectedCourse && certificateFile) {
             const formData = new FormData();
             formData.append('files.certificate', certificateFile);
-            formData.append('data', JSON.stringify({
-                employee: selectedEmployee.id,
-                course: selectedCourse.attributes.course.data.id,
-            }));
+            formData.append(
+                'data',
+                JSON.stringify({
+                    employee: selectedEmployee.id,
+                    course: selectedCourse.attributes.course.data.id
+                })
+            );
 
             fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/certificates', {
                 method: 'POST',
-                body: formData,
+                body: formData
             })
-                .then(response => response.json())
-                .then(data => {
+                .then((response) => response.json())
+                .then((data) => {
                     console.log('Certificate uploaded successfully:', data);
                     setUploadSuccess(true);
                     setTimeout(() => {
@@ -67,13 +72,12 @@ const Certificates = () => {
                     }, 3000);
                     // Optionally, you can refresh the employee courses
                 })
-                .catch(error => {
+                .catch((error) => {
                     console.error('Error uploading certificate:', error);
                     // Handle the error scenario
                 });
         }
     };
-
 
     return (
         <Grid container spacing={2}>
@@ -96,40 +100,40 @@ const Certificates = () => {
 
                     {employeeCourses.length > 0 ? (
                         <List>
-                        {employeeCourses.map(employeeCourse => (
-                            <ListItem
-                                key={employeeCourse.id}
-                                onClick={() => setSelectedCourse(employeeCourse)}
-                                button
-                                selected={selectedCourse === employeeCourse}
-                                style={{ backgroundColor: selectedCourse === employeeCourse ? 'lightblue' : 'inherit' }}
-                            >
-                                <ListItemText primary={employeeCourse.attributes.course.data.attributes.name} />
-                            </ListItem>
-                        ))}
-                    </List>
-                ) : (
-                    <Typography>No courses completed yet.</Typography>
-                )}
-            </Grid>
-        )}
+                            {employeeCourses.map((employeeCourse) => (
+                                <ListItem
+                                    key={employeeCourse.id}
+                                    onClick={() => setSelectedCourse(employeeCourse)}
+                                    button
+                                    selected={selectedCourse === employeeCourse}
+                                    style={{ backgroundColor: selectedCourse === employeeCourse ? 'lightblue' : 'inherit' }}
+                                >
+                                    <ListItemText primary={employeeCourse.attributes.course.data.attributes.name} />
+                                </ListItem>
+                            ))}
+                        </List>
+                    ) : (
+                        <Typography>No courses completed yet.</Typography>
+                    )}
+                </Grid>
+            )}
 
-        {selectedCourse && (
-            <Grid item xs={12}>
-                <Typography variant="h6">Upload Certificate for {selectedCourse.attributes.course.data.attributes.name}</Typography>
-                <input type="file" onChange={handleCertificateUpload} />
-                <Button variant="contained" onClick={handleCertificateSubmit} disabled={!certificateFile}>
-                    Upload Certificate
-                </Button>
-                {uploadSuccess && (
-                    <Alert severity="success" style={{ marginTop: '1rem' }}>
-                        Training Certificate has been successfully uploaded!
-                    </Alert>
-                )}
-            </Grid>
-        )}
-    </Grid>
-);
+            {selectedCourse && (
+                <Grid item xs={12}>
+                    <Typography variant="h6">Upload Certificate for {selectedCourse.attributes.course.data.attributes.name}</Typography>
+                    <input type="file" onChange={handleCertificateUpload} />
+                    <Button variant="contained" onClick={handleCertificateSubmit} disabled={!certificateFile}>
+                        Upload Certificate
+                    </Button>
+                    {uploadSuccess && (
+                        <Alert severity="success" style={{ marginTop: '1rem' }}>
+                            Training Certificate has been successfully uploaded!
+                        </Alert>
+                    )}
+                </Grid>
+            )}
+        </Grid>
+    );
 };
 
 export default Certificates;

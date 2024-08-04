@@ -5,12 +5,12 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 
 // Helper function to make API requests
 const api = (endpoint, method = 'GET', body = null) => {
-  const headers = { 'Content-Type': 'application/json' };
-  return fetch(`https://glowing-paradise-cfe00f2697.strapiapp.com/api${endpoint}`, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : null,
-  }).then(response => response.json());
+    const headers = { 'Content-Type': 'application/json' };
+    return fetch(`https://glowing-paradise-cfe00f2697.strapiapp.com/api${endpoint}`, {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : null
+    }).then((response) => response.json());
 };
 
 const ToDoList = () => {
@@ -18,13 +18,13 @@ const ToDoList = () => {
     const [newTodoTitle, setNewTodoTitle] = useState('');
 
     useEffect(() => {
-        api('/todos').then(data => setTodos(data.data));
+        api('/todos').then((data) => setTodos(data.data));
     }, []);
 
     const addTodo = () => {
         api('/todos', 'POST', {
             data: { title: newTodoTitle, completed: false, employee: 'default' } // Adapt 'employee' as needed
-        }).then(newTodo => {
+        }).then((newTodo) => {
             setTodos([...todos, newTodo.data]);
             setNewTodoTitle(''); // Clear the input after adding
         });
@@ -32,11 +32,9 @@ const ToDoList = () => {
 
     const toggleTodo = (id, completed) => {
         api(`/todos/${id}`, 'PUT', {
-            data: { completed: !completed },
-        }).then(updatedTodo => {
-            const newTodos = todos.map(todo =>
-                todo.id === id ? { ...todo, attributes: updatedTodo.data.attributes } : todo
-            );
+            data: { completed: !completed }
+        }).then((updatedTodo) => {
+            const newTodos = todos.map((todo) => (todo.id === id ? { ...todo, attributes: updatedTodo.data.attributes } : todo));
             setTodos(newTodos);
         });
     };
@@ -49,11 +47,11 @@ const ToDoList = () => {
                         <Grid item xs={12} key={todo.id}>
                             <FormControlLabel
                                 control={
-                                    <Checkbox 
-                                        checked={todo.attributes.completed} 
-                                        onChange={() => toggleTodo(todo.id, todo.attributes.completed)} 
-                                        name={`checked-${todo.id}`} 
-                                        color="primary" 
+                                    <Checkbox
+                                        checked={todo.attributes.completed}
+                                        onChange={() => toggleTodo(todo.id, todo.attributes.completed)}
+                                        name={`checked-${todo.id}`}
+                                        color="primary"
                                     />
                                 }
                                 label={todo.attributes.title}
@@ -80,12 +78,7 @@ const ToDoList = () => {
             <CardActions>
                 <Grid container direction="row-reverse">
                     <Grid item>
-                        <Fab
-                            size="small"
-                            color="primary"
-                            aria-label="add"
-                            onClick={() => newTodoTitle.trim() !== '' && addTodo()}
-                        >
+                        <Fab size="small" color="primary" aria-label="add" onClick={() => newTodoTitle.trim() !== '' && addTodo()}>
                             <AddRoundedIcon />
                         </Fab>
                     </Grid>

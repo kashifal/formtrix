@@ -41,8 +41,6 @@ const dashboard = {
             url: '/dashboard/training/3',
             icon: icons.IconChartInfographic,
             breadcrumbs: false
-        
-
         }
     ]
 };

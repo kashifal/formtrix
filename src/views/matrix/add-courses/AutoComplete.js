@@ -14,7 +14,7 @@ const Courses = [
     { label: 'Manual Handling', id: 4 },
     { label: 'Conflict Resolution', id: 5 },
     { label: 'GDPR', id: 6 },
-    { label: 'Risk Assessment', id: 7 },
+    { label: 'Risk Assessment', id: 7 }
 ];
 
 const Employees = [
@@ -24,7 +24,7 @@ const Employees = [
     { label: 'Dennis Danger', id: 4 },
     { label: 'Evan Empty', id: 5 },
     { label: 'Fiona Fierce', id: 6 },
-    { label: 'George James', id: 7 },
+    { label: 'George James', id: 7 }
 ];
 
 const AutoComplete = () => {
@@ -119,17 +119,21 @@ const AutoComplete = () => {
                     <Box display="flex" justifyContent="space-between" mt={2}>
                         {isCompletionDateAdded && (
                             <>
-                                <Button variant="contained" color="primary">Submit</Button>
-                                <Button variant="contained" color="primary">Submit and Add Another Employee</Button>
+                                <Button variant="contained" color="primary">
+                                    Submit
+                                </Button>
+                                <Button variant="contained" color="primary">
+                                    Submit and Add Another Employee
+                                </Button>
                             </>
                         )}
-                        <Button variant="contained" color="secondary" onClick={handleClear}>Clear</Button>
+                        <Button variant="contained" color="secondary" onClick={handleClear}>
+                            Clear
+                        </Button>
                         <Button variant="contained">Home</Button>
                     </Box>
                 </Grid>
             </Grid>
-
-            
         </MainCard>
     );
 };

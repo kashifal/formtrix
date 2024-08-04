@@ -22,11 +22,7 @@ const Dashboard = () => {
                         {isLoading ? (
                             <p>Loading...</p> // Replace with a loading indicator as needed
                         ) : (
-                            <img
-                                src="/images/Hurt.png"
-                                alt="Company Logo"
-                                style={{ width: '100%', height: 'auto', maxHeight: '100%' }}
-                            />
+                            <img src="/images/Hurt.png" alt="Company Logo" style={{ width: '100%', height: 'auto', maxHeight: '100%' }} />
                         )}
                     </CardContent>
                 </Card>

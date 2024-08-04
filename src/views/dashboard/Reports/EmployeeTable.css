@@ -1,7 +1,7 @@
 .expired {
     background-color: rgba(255, 0, 0, 0.2);
-  }
-  
-  .expiring-soon {
+}
+
+.expiring-soon {
     background-color: yellow;
-  }
+}

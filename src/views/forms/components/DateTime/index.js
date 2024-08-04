@@ -13,13 +13,9 @@ import { gridSpacing } from 'store/constant';
 // ==============================|| DATETIME ||============================== //
 
 const DateTime = () => {
-    
-
     return (
         <MainCard title="Course Completed" secondary={<SecondaryAction link="https://next.material-ui.com/components/date-time-picker/" />}>
             <Grid container spacing={gridSpacing}>
-
-
                 <Grid item xs={12} md={6}>
                     <SubCard title="Course Completed">
                         <CustomDateTime />

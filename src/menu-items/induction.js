@@ -41,8 +41,6 @@ const dashboard = {
             url: '/dashboard/training',
             icon: icons.IconChartInfographic,
             breadcrumbs: false
-        
-
         },
         {
             id: 'edit-induction',

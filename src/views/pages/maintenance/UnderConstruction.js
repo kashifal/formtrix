@@ -78,12 +78,12 @@ const CustomErrorComponent = () => {
                             <Grid container spacing={gridSpacing}>
                                 <Grid item xs={12}>
                                     <Typography variant="h1" component="div">
-                                        Fox Training Matrix 
+                                        Fox Training Matrix
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Typography variant="body2">
-                                        This page is still under construction! You have reached this page in error. 
+                                        This page is still under construction! You have reached this page in error.
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={12}>

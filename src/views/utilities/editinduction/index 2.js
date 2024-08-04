@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Grid, TextField, Button, Box
-} from '@mui/material'; // Removed 'Autocomplete' from imports
+import { Grid, TextField, Button, Box } from '@mui/material'; // Removed 'Autocomplete' from imports
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
@@ -16,16 +14,18 @@ const TrainingModule = () => {
 
     useEffect(() => {
         fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/texts/')
-            .then(response => response.json())
-            .then(data => {
-                setTexts(data.data.map(text => ({
-                    label: text.attributes.Title,
-                    id: text.id,
-                    title: text.attributes.Title,
-                    text: text.attributes.text
-                })));
+            .then((response) => response.json())
+            .then((data) => {
+                setTexts(
+                    data.data.map((text) => ({
+                        label: text.attributes.Title,
+                        id: text.id,
+                        title: text.attributes.Title,
+                        text: text.attributes.text
+                    }))
+                );
                 // Automatically select the text for "Induction"
-                const inductionText = data.data.find(t => t.attributes.Title === "Induction");
+                const inductionText = data.data.find((t) => t.attributes.Title === 'Induction');
                 if (inductionText) {
                     setSelectedText({
                         title: inductionText.attributes.Title,
@@ -39,9 +39,10 @@ const TrainingModule = () => {
     }, []);
 
     const handleSubmit = async () => {
-        const url = selectedText.id === 'new'
-            ? 'https://glowing-paradise-cfe00f2697.strapiapp.com/api/new-texts/'
-            : `https://glowing-paradise-cfe00f2697.strapiapp.com/api/texts/${selectedText.id}`;
+        const url =
+            selectedText.id === 'new'
+                ? 'https://glowing-paradise-cfe00f2697.strapiapp.com/api/new-texts/'
+                : `https://glowing-paradise-cfe00f2697.strapiapp.com/api/texts/${selectedText.id}`;
 
         const method = selectedText.id === 'new' ? 'POST' : 'PUT';
         const body = JSON.stringify({
@@ -63,7 +64,7 @@ const TrainingModule = () => {
             const responseData = await response.json();
             console.log('Success:', responseData);
             // Update local state to reflect changes
-            setTexts(texts.map(t => t.id === selectedText.id ? { ...t, title, text } : t));
+            setTexts(texts.map((t) => (t.id === selectedText.id ? { ...t, title, text } : t)));
             setSelectedText(null);
             setTitle('');
             setText('');
@@ -77,13 +78,7 @@ const TrainingModule = () => {
             <Grid container spacing={gridSpacing}>
                 <Grid item xs={12}>
                     <SubCard title="Induction Text">
-                        <TextField
-                            label="Title"
-                            fullWidth
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            sx={{ mt: 2 }}
-                        />
+                        <TextField label="Title" fullWidth value={title} onChange={(e) => setTitle(e.target.value)} sx={{ mt: 2 }} />
                         <TextField
                             label="Text"
                             fullWidth
@@ -97,8 +92,20 @@ const TrainingModule = () => {
                 </Grid>
                 <Grid item xs={12}>
                     <Box display="flex" justifyContent="space-between" mt={2}>
-                        <Button variant="contained" color="primary" onClick={handleSubmit}>Save Changes</Button>
-                        <Button variant="contained" color="secondary" onClick={() => { setTitle(''); setText(''); setSelectedText(null); }}>Clear</Button>
+                        <Button variant="contained" color="primary" onClick={handleSubmit}>
+                            Save Changes
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            onClick={() => {
+                                setTitle('');
+                                setText('');
+                                setSelectedText(null);
+                            }}
+                        >
+                            Clear
+                        </Button>
                     </Box>
                 </Grid>
             </Grid>

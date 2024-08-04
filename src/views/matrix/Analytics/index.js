@@ -3,7 +3,6 @@ import { Grid } from '@mui/material';
 
 // new way forward: go back to the previous design so that we can get everything working as intended
 
-
 // project imports
 import HeatMapChart from './HeatMapChart'; // Import HeatMapChart
 import { gridSpacing } from 'store/constant';

@@ -6,7 +6,6 @@ import Customization from 'layout/Customization';
 import AppBar from 'ui-component/extended/AppBar';
 import HeaderSection from './HeaderSection';
 
-
 // import IncludeSection from './IncludeSection';
 // import RtlInfoSection from './RtlInfoSection';
 
@@ -21,13 +20,9 @@ const HeaderWrapper = styled('div')(({ theme }) => ({
     [theme.breakpoints.down('md')]: {}
 }));
 
-
-
 // =============================|| LANDING MAIN ||============================= //
 
 const Landing = () => {
-
-
     return (
         <>
             {/* 1. header and hero section */}
@@ -38,23 +33,15 @@ const Landing = () => {
 
             {/* 2. card section */}
 
-
             {/* 4. developer experience section */}
-
 
             {/* 3. about section */}
 
-
             {/* 4. Apps */}
-
 
             {/* 5. people section */}
 
-
-
-
             {/* 9. framework section */}
-
 
             {/* 10. footer section */}
 

@@ -13,7 +13,7 @@ import {
     OutlinedInput,
     Typography,
     Checkbox,
-    FormControlLabel,
+    FormControlLabel
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -22,8 +22,7 @@ import AnimateButton from 'ui-component/extended/AnimateButton';
 const USER_CREDENTIALS = {
     username: process.env.REACT_APP_USERNAME,
     password: process.env.REACT_APP_PASSWORD
-  };
-  
+};
 
 const AuthLogin = () => {
     const theme = useTheme();
@@ -49,13 +48,7 @@ const AuthLogin = () => {
         <form noValidate onSubmit={handleSubmit}>
             <FormControl fullWidth error={Boolean(error)} sx={{ ...theme.typography.customInput }}>
                 <InputLabel htmlFor="username">Email Address</InputLabel>
-                <OutlinedInput
-                    id="username"
-                    type="email"
-                    value={username}
-                    name="email"
-                    onChange={(e) => setUsername(e.target.value)}
-                />
+                <OutlinedInput id="username" type="email" value={username} name="email" onChange={(e) => setUsername(e.target.value)} />
                 {error && (
                     <FormHelperText error id="standard-weight-helper-text-email-login">
                         {error}
@@ -88,14 +81,7 @@ const AuthLogin = () => {
 
             <Box sx={{ mt: 2 }}>
                 <AnimateButton>
-                    <Button
-                        color="primary"
-                        disabled={!username || !password}
-                        fullWidth
-                        size="large"
-                        type="submit"
-                        variant="contained"
-                    >
+                    <Button color="primary" disabled={!username || !password} fullWidth size="large" type="submit" variant="contained">
                         Sign In
                     </Button>
                 </AnimateButton>

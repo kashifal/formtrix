@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import { Box, Typography } from '@mui/material';
 import { TreeItem, TreeView } from '@mui/lab';
-import { treeItemClasses } from '@mui/lab/TreeItem';
 
 // assets
 import Label from '@mui/icons-material/Label';
@@ -13,13 +12,27 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import InfoIcon from '@mui/icons-material/Info';
 import ForumIcon from '@mui/icons-material/Forum';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowRight';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
+import { ArrowRightIcon } from '@mui/x-date-pickers';
+
+const PREFIX = 'MuiTreeItem';
+
+const classes = {
+    root: `${PREFIX}-root`,
+    content: `${PREFIX}-content`,
+    group: `${PREFIX}-group`,
+    expanded: `${PREFIX}-expanded`,
+    selected: `${PREFIX}-selected`,
+    focused: `${PREFIX}-focused`,
+    disabled: `${PREFIX}-disabled`,
+    iconContainer: `${PREFIX}-iconContainer`,
+    label: `${PREFIX}-label`
+};
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     color: theme.palette.text.secondary,
-    [`& .${treeItemClasses.content}`]: {
+    [`& .${classes.content}`]: {
         color: theme.palette.text.secondary,
         paddingRight: theme.spacing(1),
         fontWeight: theme.typography.fontWeightMedium,
@@ -33,14 +46,14 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
             backgroundColor: `var(--tree-view-bg-color, ${theme.palette.action.selected})`,
             color: 'var(--tree-view-color)'
         },
-        [`& .${treeItemClasses.label}`]: {
+        [`& .${classes.label}`]: {
             fontWeight: 'inherit',
             color: 'inherit'
         }
     },
-    [`& .${treeItemClasses.group}`]: {
+    [`& .${classes.group}`]: {
         marginLeft: 0,
-        [`& .${treeItemClasses.content}`]: {
+        [`& .${classes.content}`]: {
             paddingLeft: theme.spacing(2)
         }
     }
@@ -64,10 +77,12 @@ function StyledTreeItem({ bgColor, color, labelIcon: LabelIcon, labelInfo, label
                 '--tree-view-color': color,
                 '--tree-view-bg-color': bgColor
             }}
+            classes={classes}
             {...other}
         />
     );
 }
+
 StyledTreeItem.propTypes = {
     bgColor: PropTypes.string,
     color: PropTypes.string,

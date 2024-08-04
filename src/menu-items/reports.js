@@ -18,7 +18,7 @@ const reports = {
     icon: icons.IconDashboard,
     type: 'group',
     children: [
-/*         {
+        /*         {
             id: 'admin',
             title: <FormattedMessage id="Custom Reports" />,
             type: 'item',

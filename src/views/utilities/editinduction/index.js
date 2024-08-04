@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Autocomplete, Grid, TextField, Button, Box, Select, MenuItem, Link, Card, CardContent, Typography, Snackbar, Alert
+    Autocomplete,
+    Grid,
+    TextField,
+    Button,
+    Box,
+    Select,
+    MenuItem,
+    Link,
+    Card,
+    CardContent,
+    Typography,
+    Snackbar,
+    Alert
 } from '@mui/material';
 
 // project imports
@@ -28,51 +40,59 @@ const InductionModule = () => {
 
     useEffect(() => {
         fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/texts/')
-            .then(response => response.json())
-            .then(data => {
-                setPages(data.data.map(page => ({
-                    label: page.attributes.Title,
-                    id: page.id,
-                    title: page.attributes.Title,
-                    text: page.attributes.text,
-                    textCheckBox: page.attributes.TextCheckBox,
-                    quizElement: page.attributes.QuizElement || '',
-                    checkboxElement: page.attributes.CheckboxElement,
-                    pdfElement: page.attributes.PdfElement || '',
-                    link: getLink(page.attributes.Title)
-                })));
+            .then((response) => response.json())
+            .then((data) => {
+                setPages(
+                    data.data.map((page) => ({
+                        label: page.attributes.Title,
+                        id: page.id,
+                        title: page.attributes.Title,
+                        text: page.attributes.text,
+                        textCheckBox: page.attributes.TextCheckBox,
+                        quizElement: page.attributes.QuizElement || '',
+                        checkboxElement: page.attributes.CheckboxElement,
+                        pdfElement: page.attributes.PdfElement || '',
+                        link: getLink(page.attributes.Title)
+                    }))
+                );
             });
 
         fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/quizzes/')
-            .then(response => response.json())
-            .then(data => {
-                setQuizzes(data.data.map(quiz => ({
-                    id: quiz.id,
-                    question: quiz.attributes.Question,
-                    options: quiz.attributes.Options,
-                    correct: quiz.attributes.Correct
-                })));
+            .then((response) => response.json())
+            .then((data) => {
+                setQuizzes(
+                    data.data.map((quiz) => ({
+                        id: quiz.id,
+                        question: quiz.attributes.Question,
+                        options: quiz.attributes.Options,
+                        correct: quiz.attributes.Correct
+                    }))
+                );
             });
 
         fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/pdfs/')
-            .then(response => response.json())
-            .then(data => {
-                setPdfs(data.data.map(pdf => ({
-                    id: pdf.id,
-                    pdfname: pdf.attributes.pdfname,
-                    pdfcontent: pdf.attributes.pdfcontent
-                })));
+            .then((response) => response.json())
+            .then((data) => {
+                setPdfs(
+                    data.data.map((pdf) => ({
+                        id: pdf.id,
+                        pdfname: pdf.attributes.pdfname,
+                        pdfcontent: pdf.attributes.pdfcontent
+                    }))
+                );
             });
 
         fetch('https://glowing-paradise-cfe00f2697.strapiapp.com/api/video-pages/')
-            .then(response => response.json())
-            .then(data => {
-                setVideos(data.data.map(video => ({
-                    id: video.id,
-                    name: video.attributes.VideoName,
-                    url: video.attributes.URL,
-                    description: video.attributes.Description
-                })));
+            .then((response) => response.json())
+            .then((data) => {
+                setVideos(
+                    data.data.map((video) => ({
+                        id: video.id,
+                        name: video.attributes.VideoName,
+                        url: video.attributes.URL,
+                        description: video.attributes.Description
+                    }))
+                );
             });
     }, []);
 
@@ -106,14 +126,14 @@ const InductionModule = () => {
             setQuizOptions([]);
             setQuizCorrectAnswer('');
             if (['About the Fox Group', 'Equality and Diversity', 'The Environment'].includes(newValue.title)) {
-                const video = videos.find(v => v.name === newValue.title);
+                const video = videos.find((v) => v.name === newValue.title);
                 setVideoElement(video ? video.url : '');
             } else {
                 setVideoElement('');
             }
 
             if (newValue.title === 'Equality and Diversity') {
-                const quiz = quizzes.find(q => q.question === newValue.quizElement);
+                const quiz = quizzes.find((q) => q.question === newValue.quizElement);
                 if (quiz) {
                     setQuizOptions(quiz.options);
                     setQuizCorrectAnswer(quiz.correct);
@@ -134,13 +154,13 @@ const InductionModule = () => {
     };
 
     const handlePdfChange = (event) => {
-        const selectedPdf = pdfs.find(pdf => pdf.pdfname === event.target.value);
+        const selectedPdf = pdfs.find((pdf) => pdf.pdfname === event.target.value);
         setPdfElement(event.target.value);
         setPdfContent(selectedPdf ? selectedPdf.pdfcontent : '');
     };
 
     const handleQuizChange = (event) => {
-        const selectedQuiz = quizzes.find(quiz => quiz.question === event.target.value);
+        const selectedQuiz = quizzes.find((quiz) => quiz.question === event.target.value);
         setQuizElement(event.target.value);
         if (selectedQuiz) {
             setQuizOptions(selectedQuiz.options);
@@ -177,12 +197,14 @@ const InductionModule = () => {
 
             const responseData = await response.json();
             console.log('Success:', responseData);
-            const updatedPages = pages.map(p => p.id === selectedPage.id ? { ...p, title, text, textCheckBox, quizElement, checkboxElement, pdfElement, videoElement } : p);
+            const updatedPages = pages.map((p) =>
+                p.id === selectedPage.id ? { ...p, title, text, textCheckBox, quizElement, checkboxElement, pdfElement, videoElement } : p
+            );
             setPages(updatedPages);
 
             // Update quizzes and PDFs separately if they were changed
             if (selectedPage.title === 'Equality and Diversity') {
-                const quizUrl = `https://glowing-paradise-cfe00f2697.strapiapp.com/api/quizzes/${quizzes.find(q => q.question === quizElement).id}`;
+                const quizUrl = `https://glowing-paradise-cfe00f2697.strapiapp.com/api/quizzes/${quizzes.find((q) => q.question === quizElement).id}`;
                 const quizBody = JSON.stringify({
                     data: {
                         Question: quizElement,
@@ -200,7 +222,7 @@ const InductionModule = () => {
             }
 
             if (selectedPage.title === 'Fox Group Policies') {
-                const pdfUrl = `https://glowing-paradise-cfe00f2697.strapiapp.com/api/pdfs/${pdfs.find(p => p.pdfname === pdfElement).id}`;
+                const pdfUrl = `https://glowing-paradise-cfe00f2697.strapiapp.com/api/pdfs/${pdfs.find((p) => p.pdfname === pdfElement).id}`;
                 const pdfBody = JSON.stringify({
                     data: {
                         pdfcontent: pdfContent
@@ -239,12 +261,7 @@ const InductionModule = () => {
                 {selectedPage && (
                     <Grid item xs={12}>
                         <SubCard title="Page Content">
-                            <TextField
-                                label="Title"
-                                fullWidth
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                            />
+                            <TextField label="Title" fullWidth value={title} onChange={(e) => setTitle(e.target.value)} />
                             <TextField
                                 label="Text"
                                 fullWidth
@@ -261,19 +278,15 @@ const InductionModule = () => {
                                 onChange={(e) => setTextCheckBox(e.target.value)}
                                 sx={{ mt: 2 }}
                             />
-                            
+
                             {selectedPage.title === 'Equality and Diversity' && (
                                 <>
-                                    <Select
-                                        label="Quiz Element"
-                                        fullWidth
-                                        value={quizElement}
-                                        onChange={handleQuizChange}
-                                        sx={{ mt: 2 }}
-                                    >
+                                    <Select label="Quiz Element" fullWidth value={quizElement} onChange={handleQuizChange} sx={{ mt: 2 }}>
                                         <MenuItem value="">No Quiz</MenuItem>
-                                        {quizzes.map(quiz => (
-                                            <MenuItem key={quiz.id} value={quiz.question}>{quiz.question}</MenuItem>
+                                        {quizzes.map((quiz) => (
+                                            <MenuItem key={quiz.id} value={quiz.question}>
+                                                {quiz.question}
+                                            </MenuItem>
                                         ))}
                                     </Select>
                                     {quizElement && (
@@ -310,19 +323,15 @@ const InductionModule = () => {
                                     )}
                                 </>
                             )}
-                            
+
                             {selectedPage.title === 'Fox Group Policies' && (
                                 <>
-                                    <Select
-                                        label="PDF Element"
-                                        fullWidth
-                                        value={pdfElement}
-                                        onChange={handlePdfChange}
-                                        sx={{ mt: 2 }}
-                                    >
+                                    <Select label="PDF Element" fullWidth value={pdfElement} onChange={handlePdfChange} sx={{ mt: 2 }}>
                                         <MenuItem value="">No PDF</MenuItem>
-                                        {pdfs.map(pdf => (
-                                            <MenuItem key={pdf.id} value={pdf.pdfname}>{pdf.pdfname}</MenuItem>
+                                        {pdfs.map((pdf) => (
+                                            <MenuItem key={pdf.id} value={pdf.pdfname}>
+                                                {pdf.pdfname}
+                                            </MenuItem>
                                         ))}
                                     </Select>
                                     {pdfElement && (
@@ -338,8 +347,10 @@ const InductionModule = () => {
                                     )}
                                 </>
                             )}
-                            
-                            {(selectedPage.title === 'About the Fox Group' || selectedPage.title === 'Equality and Diversity' || selectedPage.title === 'The Environment') && (
+
+                            {(selectedPage.title === 'About the Fox Group' ||
+                                selectedPage.title === 'Equality and Diversity' ||
+                                selectedPage.title === 'The Environment') && (
                                 <>
                                     <TextField
                                         label="Video URL"
@@ -350,7 +361,9 @@ const InductionModule = () => {
                                     />
                                     <Card sx={{ mt: 2 }}>
                                         <CardContent>
-                                            <Typography variant="h6" component="div">Video Preview</Typography>
+                                            <Typography variant="h6" component="div">
+                                                Video Preview
+                                            </Typography>
                                             {videoElement && (
                                                 <iframe
                                                     title={`video-preview-${selectedPage.title}`}
@@ -377,8 +390,28 @@ const InductionModule = () => {
 
                 <Grid item xs={12}>
                     <Box display="flex" justifyContent="space-between" mt={2}>
-                        <Button variant="contained" color="primary" onClick={handleSubmit} disabled={!selectedPage}>Save Changes</Button>
-                        <Button variant="contained" color="secondary" onClick={() => { setSelectedPage(null); setTitle(''); setText(''); setTextCheckBox(''); setQuizElement(''); setCheckboxElement(''); setPdfElement(''); setPdfContent(''); setQuizOptions([]); setQuizCorrectAnswer(''); setVideoElement(''); }}>Clear</Button>
+                        <Button variant="contained" color="primary" onClick={handleSubmit} disabled={!selectedPage}>
+                            Save Changes
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            onClick={() => {
+                                setSelectedPage(null);
+                                setTitle('');
+                                setText('');
+                                setTextCheckBox('');
+                                setQuizElement('');
+                                setCheckboxElement('');
+                                setPdfElement('');
+                                setPdfContent('');
+                                setQuizOptions([]);
+                                setQuizCorrectAnswer('');
+                                setVideoElement('');
+                            }}
+                        >
+                            Clear
+                        </Button>
                     </Box>
                 </Grid>
             </Grid>

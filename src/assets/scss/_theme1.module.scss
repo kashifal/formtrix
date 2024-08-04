@@ -77,16 +77,15 @@ $darkTextSecondary: #d8ddf0;
 
 // ==============================|| JAVASCRIPT ||============================== //
 
-
 .expired {
     background-color: rgba(255, 0, 0, 0.2);
-  }
-  
-  .expiring-soon {
-    background-color: yellow;
-  }
+}
 
-  //
+.expiring-soon {
+    background-color: yellow;
+}
+
+//
 
 :export {
     // paper & background

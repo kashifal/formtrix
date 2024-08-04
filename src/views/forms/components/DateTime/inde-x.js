@@ -12,30 +12,30 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 const locales = ['en-gb'];
 
 export default function LocalizationDayjs() {
-  const [locale, setLocale] = React.useState('en');
+    const [locale, setLocale] = React.useState('en');
 
-  return (
-    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={locale}>
-      <Stack spacing={3} sx={{ width: 300 }}>
-        <ToggleButtonGroup
-          value={locale}
-          exclusive
-          fullWidth
-          onChange={(event, newLocale) => {
-            if (newLocale != null) {
-              setLocale(newLocale);
-            }
-          }}
-        >
-          {locales.map((localeItem) => (
-            <ToggleButton key={localeItem} value={localeItem}>
-              {localeItem}
-            </ToggleButton>
-          ))}
-        </ToggleButtonGroup>
-        <DateField label="Date" defaultValue={dayjs('2022-04-17')} />
-        <TimeField label="Time" defaultValue={dayjs('2022-04-17T18:30')} />
-      </Stack>
-    </LocalizationProvider>
-  );
+    return (
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={locale}>
+            <Stack spacing={3} sx={{ width: 300 }}>
+                <ToggleButtonGroup
+                    value={locale}
+                    exclusive
+                    fullWidth
+                    onChange={(event, newLocale) => {
+                        if (newLocale != null) {
+                            setLocale(newLocale);
+                        }
+                    }}
+                >
+                    {locales.map((localeItem) => (
+                        <ToggleButton key={localeItem} value={localeItem}>
+                            {localeItem}
+                        </ToggleButton>
+                    ))}
+                </ToggleButtonGroup>
+                <DateField label="Date" defaultValue={dayjs('2022-04-17')} />
+                <TimeField label="Time" defaultValue={dayjs('2022-04-17T18:30')} />
+            </Stack>
+        </LocalizationProvider>
+    );
 }

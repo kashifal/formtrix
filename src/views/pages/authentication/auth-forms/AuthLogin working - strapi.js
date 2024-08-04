@@ -33,7 +33,6 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 // ...rest of your component
 
-
 const AuthLogin = ({ loginProp, ...others }) => {
     const theme = useTheme();
     const navigate = useNavigate(); // Correct use of useNavigate for react-router-dom v6+
@@ -59,9 +58,9 @@ const AuthLogin = ({ loginProp, ...others }) => {
                 try {
                     const response = await axios.post('https://glowing-paradise-cfe00f2697.strapiapp.com/auth/local', {
                         identifier: values.email,
-                        password: values.password,
+                        password: values.password
                     });
-        
+
                     setStatus({ success: true });
                     setSubmitting(false);
                     navigate('/dashboard'); // Use navigate to redirect on successful login
@@ -91,7 +90,7 @@ const AuthLogin = ({ loginProp, ...others }) => {
                             </FormHelperText>
                         )}
                     </FormControl>
-    
+
                     <FormControl fullWidth error={Boolean(touched.password && errors.password)} sx={{ ...theme.typography.customInput }}>
                         <InputLabel htmlFor="outlined-adornment-password-login">Password</InputLabel>
                         <OutlinedInput
@@ -122,7 +121,7 @@ const AuthLogin = ({ loginProp, ...others }) => {
                             </FormHelperText>
                         )}
                     </FormControl>
-    
+
                     <Grid container alignItems="center" justifyContent="space-between">
                         <Grid item>
                             <FormControlLabel
@@ -149,23 +148,16 @@ const AuthLogin = ({ loginProp, ...others }) => {
                             </Typography>
                         </Grid>
                     </Grid>
-    
+
                     {errors.submit && (
                         <Box sx={{ mt: 3 }}>
                             <FormHelperText error>{errors.submit}</FormHelperText>
                         </Box>
                     )}
-    
+
                     <Box sx={{ mt: 2 }}>
                         <AnimateButton>
-                            <Button
-                                color="primary"
-                                disabled={isSubmitting}
-                                fullWidth
-                                size="large"
-                                type="submit"
-                                variant="contained"
-                            >
+                            <Button color="primary" disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained">
                                 Sign In
                             </Button>
                         </AnimateButton>
@@ -181,4 +173,3 @@ AuthLogin.propTypes = {
 };
 
 export default AuthLogin;
-

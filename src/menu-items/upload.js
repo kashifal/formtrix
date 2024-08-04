@@ -24,8 +24,7 @@ const upload = {
     icon: icons.IconApps,
     type: 'group',
     children: [
-        
-/*         {
+        /*         {
             id: 'Company',
             title: <FormattedMessage id="Add Company" />,
             type: 'item',
@@ -37,7 +36,7 @@ const upload = {
             title: 'Add Certificates',
             type: 'item',
             icon: icons.IconUserCheck,
-            url: '/apps/kanban/board'
+            url: '/certificates'
         },
         {
             id: 'mail',
@@ -46,7 +45,7 @@ const upload = {
             icon: icons.IconUserCheck,
             url: '/apps/bulkupload'
         },
-/*         {
+        /*         {
             id: 'staff',
             title: <FormattedMessage id="Upload Courses" />,
             type: 'item',
@@ -69,7 +68,6 @@ const upload = {
             icon: icons.IconLayoutKanban,
             breadcrumbs: false
         }
-      
     ]
 };
 

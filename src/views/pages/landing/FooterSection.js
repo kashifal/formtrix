@@ -66,7 +66,8 @@ const FooterSection = () => {
                                         Fox Training Matrix
                                     </Typography>
                                     <Typography variant="body2" color={textColor}>
-                                        Fox Training Matrix empowers you to see clearly where your staff are trained and where there are gaps.
+                                        Fox Training Matrix empowers you to see clearly where your staff are trained and where there are
+                                        gaps.
                                     </Typography>
                                 </Stack>
                             </Grid>
