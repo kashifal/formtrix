@@ -47,7 +47,7 @@ const FirebaseLogin = ({ loginProp, ...others }) => {
     const theme = useTheme();
     const scriptedRef = useScriptRef();
     const { borderRadius } = useConfig();
-    const { setAuthenticated, authenticated } = useAuth();
+    const { setAuthenticated } = useAuth();
     const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
 
     const [checked, setChecked] = React.useState(true);
@@ -80,19 +80,19 @@ const FirebaseLogin = ({ loginProp, ...others }) => {
     //   setAuthenticated(false);
     // }
 
-    const token = localStorage.getItem('token');
     useEffect(() => {
-        if (token !== null) {
-            setAuthenticated(true);
-            navigate('/dashboard/default');
-            console.log('====================================');
-            console.log(authenticated);
-            console.log('====================token================');
-        } else {
-            setAuthenticated(false);
-        }
-
-        console.log({ token: token });
+        localStorage.getItem('token').then((token) => {
+            if (token !== null) {
+                console.log({ token });
+                setAuthenticated(true);
+                navigate('/dashboard/default');
+                console.log('====================================');
+                console.log({ token: token() });
+                console.log('====================token================');
+            } else {
+                setAuthenticated(false);
+            }
+        });
     }, []);
     return (
         <>
