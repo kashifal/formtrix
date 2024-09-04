@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import client from 'axios.config';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -21,36 +22,37 @@ import {
     Typography,
     useMediaQuery
 } from '@mui/material';
-
 // third party
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 
 // project imports
 import AnimateButton from 'ui-component/extended/AnimateButton';
-
-import useAuth from 'hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
+// import useAuth from 'hooks/useAuth';
 import useConfig from 'hooks/useConfig';
 import useScriptRef from 'hooks/useScriptRef';
-
+import useAuth from 'hooks/useAuth';
 // assets
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 import Google from 'assets/images/icons/google.svg';
+import localStorage from 'redux-persist/es/storage';
 
 // ============================|| FIREBASE - LOGIN ||============================ //
 
 const FirebaseLogin = ({ loginProp, ...others }) => {
+    const navigate = useNavigate();
     const theme = useTheme();
     const scriptedRef = useScriptRef();
     const { borderRadius } = useConfig();
-
+    const { setAuthenticated, authenticated } = useAuth();
     const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
 
     const [checked, setChecked] = React.useState(true);
 
-    const { firebaseEmailPasswordSignIn, firebaseGoogleSignIn } = useAuth();
+    // const { firebaseEmailPasswordSignIn, firebaseGoogleSignIn } = useAuth();
     const googleHandler = async () => {
         try {
             await firebaseGoogleSignIn();
@@ -68,6 +70,30 @@ const FirebaseLogin = ({ loginProp, ...others }) => {
         event.preventDefault();
     };
 
+    // const token = localStorage.getItem('token');                   if (token !== null) {
+    //   const tokenDecode: any = jwtDecode(token);
+    //   const exp = dayjs(tokenDecode.exp * 1000);
+    //   const now = dayjs(Date.now());
+    //   const isExpired = now.diff(exp, "minute") > 59;
+    //   setAuthenticated(!isExpired);
+    // } else {
+    //   setAuthenticated(false);
+    // }
+
+    const token = localStorage.getItem('token');
+    useEffect(() => {
+        if (token !== null) {
+            setAuthenticated(true);
+            navigate('/dashboard/default');
+            console.log('====================================');
+            console.log(authenticated);
+            console.log('====================token================');
+        } else {
+            setAuthenticated(false);
+        }
+
+        console.log({ token: token });
+    }, []);
     return (
         <>
             <Grid container direction="column" justifyContent="center" spacing={2}>
@@ -134,29 +160,38 @@ const FirebaseLogin = ({ loginProp, ...others }) => {
 
             <Formik
                 initialValues={{
-                    email: 'email address',
-                    password: 'password',
+                    email: '',
+                    password: '',
                     submit: null
                 }}
                 validationSchema={Yup.object().shape({
                     email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
                     password: Yup.string().max(255).required('Password is required')
                 })}
-                onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
+                onSubmit={async (values, { setStatus, setSubmitting }) => {
                     try {
-                        await firebaseEmailPasswordSignIn(values.email, values.password);
+                        const response = await client.post('/auth/local', {
+                            identifier: values.email,
+                            password: values.password
+                        });
 
+                        if (response?.user?.email) {
+                            setAuthenticated(true);
+                        }
+
+                        // Save token to localStorage
+                        console.log('====================================');
+                        console.log(response);
+                        console.log('====================================');
+                        const token = response.jwt;
+                        localStorage.setItem('token', token);
+                        navigate('/dashboard/default', { replace: true });
                         if (scriptedRef.current) {
                             setStatus({ success: true });
                             setSubmitting(false);
                         }
                     } catch (err) {
                         console.error(err);
-                        if (scriptedRef.current) {
-                            setStatus({ success: false });
-                            setErrors({ submit: err.message });
-                            setSubmitting(false);
-                        }
                     }
                 }}
             >

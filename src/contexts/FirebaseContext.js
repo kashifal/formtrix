@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { createContext, useEffect, useReducer } from 'react';
+import { createContext, useEffect, useReducer, useState } from 'react';
 
 // third-party
 import firebase from 'firebase/compat/app';
@@ -37,7 +37,21 @@ const FirebaseContext = createContext(null);
 
 export const FirebaseProvider = ({ children }) => {
     const [state, dispatch] = useReducer(accountReducer, initialState);
+    const [authenticated, setAuthenticated] = useState(false);
+    const token = localStorage.getItem('token');
+    useEffect(() => {
+        if (token !== null) {
+            setAuthenticated(true);
+            // navigate('/dashboard/default', { replace: true });
+            console.log('====================================');
+            console.log(authenticated);
+            console.log('====================token================');
+        } else {
+            setAuthenticated(false);
+        }
 
+        console.log({ token: token });
+    }, []);
     useEffect(
         () =>
             firebase.auth().onIdTokenChanged((user) => {
@@ -88,6 +102,8 @@ export const FirebaseProvider = ({ children }) => {
         <FirebaseContext.Provider
             value={{
                 ...state,
+                authenticated,
+                setAuthenticated,
                 firebaseRegister,
                 firebaseEmailPasswordSignIn,
                 login: () => {},

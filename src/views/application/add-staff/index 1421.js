@@ -11,6 +11,8 @@ const Employeeupload = () => {
 
     useEffect(() => {
         fetchCompanies();
+        const data = fetch();
+        console.log(data);
     }, []);
 
     const fetchCompanies = () => {

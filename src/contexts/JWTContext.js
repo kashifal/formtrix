@@ -91,6 +91,7 @@ export const JWTProvider = ({ children }) => {
                 user
             }
         });
+        console.log(user);
     };
 
     const register = async (email, password, firstName, lastName) => {
